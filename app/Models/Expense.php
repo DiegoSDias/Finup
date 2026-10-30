@@ -24,12 +24,17 @@ class Expense extends Model
         'is_installment',
         'current_installment',
         'total_installments',
-        'installments_group'
+        'installments_group',
+        'recurring_expense_id',
+        'recurrence_occurrence_date',
+        'recurrence_is_override',
+        'recurrence_status',
     ];
 
     protected $casts = [
         'date' => 'date',
         'amount' => 'decimal:2',
+        'recurrence_occurrence_date' => 'date', 'recurrence_is_override' => 'boolean',
     ];
 
     public function user(): BelongsTo {
@@ -44,6 +49,8 @@ class Expense extends Model
     {
         return $this->belongsTo(ManualBank::class);
     }
+
+    public function recurringExpense(): BelongsTo { return $this->belongsTo(RecurringExpense::class); }
 
     public function getBankLabelAttribute(): string
     {
@@ -76,6 +83,13 @@ class Expense extends Model
     public function scopeExpense(Builder $query)
     {
         return $query->where('type', 'expense');
+    }
+
+    public function scopeIncludedInTotals(Builder $query): Builder
+    {
+        return $query->where(fn (Builder $query) => $query
+            ->whereNull('recurrence_status')
+            ->orWhere('recurrence_status', 'active'));
     }
 
     public function scopeYear(Builder $query, int $year)

@@ -82,4 +82,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(PluggyTransactionRule::class);
     }
+
+    public function manualBanks(): HasMany
+    {
+        return $this->hasMany(ManualBank::class);
+    }
+
+    public function recurringExpenses(): HasMany
+    {
+        return $this->hasMany(RecurringExpense::class);
+    }
 }
