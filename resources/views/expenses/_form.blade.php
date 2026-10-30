@@ -140,6 +140,7 @@
     @php
         $initialBank = isset($expense) ? ($expense->bank_status === 'bank' ? (string) $expense->manual_bank_id : ($expense->bank_status ?? 'unknown')) : '';
         $singleBankEdit = isset($expense) && $expense->installments_group && old('installment_scope', 'single') === 'single';
+        $isRecurring = isset($expense) && $expense->recurring_expense_id;
     @endphp
     <div id="bankControls" @class(['hidden' => $singleBankEdit])>
         <label for="bankChoice" class="block text-sm font-semibold text-slate-700 mb-2">Banco da movimentação</label>
@@ -180,6 +181,7 @@
             @error('payment_mode') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
         </div>
 
+        @if (! $isRecurring)
         <div id="installmentControls" @class(['hidden' => isset($expense) && $expense->installments_group && old('installment_scope', 'single') === 'single'])>
         {{-- Compra parcelada --}}
         <div>
@@ -238,6 +240,7 @@
             <p class="mt-1.5 text-xs text-blue-600">Número mínimo de parcelas: 2</p>
         </div>
         </div>
+        @endif
     @endif
 
     {{-- Campos ocultos --}}
@@ -263,7 +266,7 @@
             bankControls.querySelectorAll('input, select').forEach(input => input.disabled = Boolean(single));
             newBankField.classList.toggle('hidden', bankChoice.value !== 'new');
         }
-        bankChoice.addEventListener('change', toggleBank);
+        if (bankChoice) bankChoice.addEventListener('change', toggleBank);
         if (scopeSelect) scopeSelect.addEventListener('change', toggleBank);
         toggleBank();
 

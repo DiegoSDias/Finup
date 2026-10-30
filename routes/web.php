@@ -5,6 +5,7 @@ use App\Http\Controllers\MonthsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\RecurringExpenseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Pluggy\PluggyController;
 use App\Http\Controllers\Pluggy\PluggyAccountController;
@@ -25,6 +26,13 @@ Route::middleware('auth')->group( function() {
     Route::post('months/{year}/{month}', [MonthsController::class, 'close'])->name('month.close');
     Route::get('expenses/{expense}/confirm-delete', [ExpensesController::class, 'confirmDelete'])->name('expenses.confirm-delete');
     Route::resource('expenses', ExpensesController::class);
+    Route::get('recurring-expenses', [RecurringExpenseController::class, 'index'])->name('recurring-expenses.index');
+    Route::get('recurring-expenses/create', [RecurringExpenseController::class, 'create'])->name('recurring-expenses.create');
+    Route::post('recurring-expenses', [RecurringExpenseController::class, 'store'])->name('recurring-expenses.store');
+    Route::get('recurring-expenses/{recurringExpense}/edit', [RecurringExpenseController::class, 'edit'])->name('recurring-expenses.edit');
+    Route::put('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'update'])->name('recurring-expenses.update');
+    Route::post('recurring-expenses/{recurringExpense}/end', [RecurringExpenseController::class, 'end'])->name('recurring-expenses.end');
+    Route::delete('recurring-expenses/{recurringExpense}', [RecurringExpenseController::class, 'destroy'])->name('recurring-expenses.destroy');
     Route::resource('categories', CategoriesController::class);
     Route::resource('category-groups', CategoryGroupController::class);
 

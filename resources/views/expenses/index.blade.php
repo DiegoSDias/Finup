@@ -24,6 +24,7 @@
                         </svg>
                         Despesa
                     </a>
+                    <a href="{{ route('recurring-expenses.index') }}" class="group px-5 py-2.5 rounded-xl border border-rose-200 bg-white text-rose-700 font-medium hover:bg-rose-50 transition-all flex items-center gap-2">↻ Recorrências</a>
                 </div>
             </div>
         </div>
@@ -201,6 +202,9 @@
                                             </span>
                                         @else
                                             <span class="text-slate-400 text-xs">—</span>
+                                        @endif
+                                        @if($expense instanceof \App\Models\Expense && $expense->recurring_expense_id)
+                                            <span class="ml-2 inline-flex px-2 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-700">Recorrente</span>
                                         @endif
                                         @if($expense instanceof \App\Models\PluggyTransaction)
                                             <span class="ml-2 inline-flex px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700">Banco</span>

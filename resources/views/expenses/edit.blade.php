@@ -42,6 +42,17 @@
                         <p class="text-sm text-slate-600 mb-4">Para o grupo, informe o valor total e a data da primeira parcela. As parcelas serão recriadas com o banco e a forma de pagamento informados, substituindo diferenças anteriores.</p>
                     @endif
 
+                    @if ($expense->recurring_expense_id && $recurringExpense?->is_active)
+                        <label for="recurrenceScope" class="block text-sm font-semibold text-slate-700 mb-2">Aplicar alterações a</label>
+                        <select id="recurrenceScope" name="recurrence_scope" class="w-full rounded-xl border-slate-200 mb-2">
+                            <option value="single" @selected(old('recurrence_scope', 'single') === 'single')>Somente esta ocorrência</option>
+                            <option value="future" @selected(old('recurrence_scope') === 'future')>Esta e as próximas</option>
+                        </select>
+                        <p class="text-sm text-slate-600 mb-4">Para “esta e as próximas”, a série mantém seu calendário original; use “somente esta ocorrência” para mudar a data. Exceções futuras que você já editou ou excluiu individualmente serão preservadas.</p>
+                    @elseif ($expense->recurring_expense_id)
+                        <p class="text-sm text-slate-600 mb-4">Esta recorrência já foi encerrada. As alterações serão aplicadas somente a esta ocorrência.</p>
+                    @endif
+
                     @include('expenses._form', [
                         'expense' => $expense,
                         'type' => $expense->type
@@ -119,6 +130,18 @@
             amountInput.value = scopeDefaults[this.value].amount;
             dateInput.value = scopeDefaults[this.value].date;
         });
+        @endif
+        @if ($expense->recurring_expense_id && $recurringExpense?->is_active)
+        const recurrenceScope = document.getElementById('recurrenceScope');
+        const recurrenceDate = document.querySelector('input[name="date"]');
+        function syncRecurrenceDate() {
+            const appliesToFuture = recurrenceScope.value === 'future';
+            recurrenceDate.readOnly = appliesToFuture;
+            recurrenceDate.classList.toggle('bg-slate-100', appliesToFuture);
+            recurrenceDate.title = appliesToFuture ? 'A data da série é mantida ao alterar esta e as próximas ocorrências.' : '';
+        }
+        recurrenceScope.addEventListener('change', syncRecurrenceDate);
+        syncRecurrenceDate();
         @endif
         const categorySelect = document.getElementById('categorySelect')
         const newCategoryField = document.getElementById('newCategoryField')

@@ -12,6 +12,7 @@ use Str;
 use App\Support\Money;
 use Carbon\Carbon;
 use App\Models\ManualBank;
+use App\Services\RecurringExpenseService;
 
 class ExpensesController extends Controller
 {
@@ -95,8 +96,10 @@ class ExpensesController extends Controller
             $groupDate = $installments->first()?->date->format('Y-m-d');
         }
 
+        $recurringExpense = $expense->recurringExpense;
+
         $banks = ManualBank::where('user_id', Auth::id())->orderBy('name')->get();
-        return view('expenses.edit', compact('expense', 'type', 'year', 'month', 'categories', 'groupTotal', 'groupDate', 'banks'));
+        return view('expenses.edit', compact('expense', 'type', 'year', 'month', 'categories', 'groupTotal', 'groupDate', 'banks', 'recurringExpense'));
     }
 
     /**
@@ -110,6 +113,9 @@ class ExpensesController extends Controller
         $data['year'] = $date->year;
         $data['month'] = $date->month;
 
+        $isRecurring = false;
+        $recurringYear = null;
+        $recurringMonth = null;
         if(!empty($data['is_installment'])) {
             $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
             $data['current_installment'] = $expense->current_installment;
@@ -120,11 +126,17 @@ class ExpensesController extends Controller
         } else {
              $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
         }
+
+        if ($expense->recurring_expense_id) {
+            $isRecurring = true;
+            $recurringYear = $expense->year;
+            $recurringMonth = $expense->month;
+        }
         
         $this->expenseService->update($expense, $data);
         
         return redirect()
-            ->route('month.show', [ $data['year'], $data['month']])
+            ->route('month.show', [ $isRecurring ? $recurringYear : $data['year'], $isRecurring ? $recurringMonth : $data['month']])
             ->with('success', 'Despesa atualizada com sucesso!');
     }
 
@@ -141,10 +153,14 @@ class ExpensesController extends Controller
     public function destroy(Request $request, Expense $expense)
     {
         abort_unless($expense->user_id === Auth::id(), 404);
-        $scope = $request->validate(['installment_scope' => 'nullable|in:single,group']);
+        $scope = $request->validate(['installment_scope' => 'nullable|in:single,group', 'recurrence_scope' => 'nullable|in:single,future']);
         $year = $expense->year;
         $month = $expense->month;
-        $this->expenseService->destroy($expense, $scope['installment_scope'] ?? 'single');
+        if ($expense->recurring_expense_id && ($scope['recurrence_scope'] ?? 'single') === 'future') {
+            app(RecurringExpenseService::class)->end($expense->recurringExpense, $expense->recurrence_occurrence_date ?? $expense->date, true);
+        } else {
+            $this->expenseService->destroy($expense, $scope['installment_scope'] ?? 'single');
+        }
 
         return redirect()
             ->route('month.show', [$year, $month])

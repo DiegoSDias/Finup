@@ -64,6 +64,7 @@ class ExpensesRequest extends FormRequest
                 'nullable', 'integer', 'min:2', 'max:255',
             ],
             'installment_scope' => 'nullable|in:single,group',
+            'recurrence_scope' => 'nullable|in:single,future',
         ];
     }
 }
