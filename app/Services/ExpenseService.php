@@ -114,6 +114,13 @@ class ExpenseService
     {
         DB::transaction(function () use ($expense, $data) {
 
+            if ($expense->recurring_expense_id) {
+                $data['category_id'] = $this->resolveCategory($data);
+                $data = $this->resolveBank($data);
+                app(RecurringExpenseService::class)->updateOccurrence($expense, $data, $data['recurrence_scope'] ?? 'single');
+                return;
+            }
+
             $first = $expense->installments_group && ($data['installment_scope'] ?? 'group') === 'group'
                 ? Expense::where('user_id', Auth::id())->where('installments_group', $expense->installments_group)->orderBy('year')->orderBy('month')->first()
                 : $expense;
@@ -185,6 +192,10 @@ class ExpenseService
 
     public function destroy(Expense $expense, string $scope = 'group') {
         DB::transaction(function() use($expense, $scope) {
+            if ($expense->recurring_expense_id) {
+                app(RecurringExpenseService::class)->skipOccurrence($expense);
+                return;
+            }
             $first = !empty($expense->installments_group) && $scope === 'group'
                 ? Expense::where('user_id', Auth::id())->where('installments_group', $expense->installments_group)->orderBy('year')->orderBy('month')->first()
                 : $expense;

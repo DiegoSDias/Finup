@@ -21,6 +21,7 @@ class MonthlyBalanceService
         $userId ??= Auth::id();
         $incomes = Expense::where('user_id', $userId)
             ->where('type', 'income')
+            ->includedInTotals()
             ->where('year', $year)
             ->where('month', $month)
             ->get(['amount'])->sum(fn ($item) => Money::cents($item->amount));
@@ -45,6 +46,7 @@ class MonthlyBalanceService
 
         $expensesNormal = Expense::where('user_id', $userId)
             ->where('type', 'expense')
+            ->includedInTotals()
             ->where('year', $year)
             ->where('month', $month)
             ->where(fn ($query) => $query->where('payment_mode', '!=', 'pix')->orWhereNull('payment_mode'))
@@ -52,6 +54,7 @@ class MonthlyBalanceService
 
         $expensesPix = Expense::where('user_id', $userId)
             ->where('type', 'expense')
+            ->includedInTotals()
             ->where('year', $year)
             ->where('month', $month)
             ->where('payment_mode', 'pix')

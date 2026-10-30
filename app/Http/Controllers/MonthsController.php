@@ -6,22 +6,27 @@ use App\Models\Category;
 use App\Models\Expense;
 use App\Models\PluggyTransaction;
 use App\Services\MonthlyBalanceService;
+use App\Services\RecurringExpenseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Support\Money;
 
 class MonthsController extends Controller
 {
-    protected MonthlyBalanceService $monthlyBalanceService;
-    public function __construct(MonthlyBalanceService $monthlyBalanceService) {
-        $this->monthlyBalanceService = $monthlyBalanceService;
+    public function __construct(
+        protected MonthlyBalanceService $monthlyBalanceService,
+        protected RecurringExpenseService $recurrences,
+    ) {
     }
 
     public function show(Request $request ,String $year, String $month) {
 
+        $this->recurrences->ensureMonth(Auth::id(), (int) $year, (int) $month);
+
         $expenses = Expense::where('user_id', Auth::id())
             ->where('month', $month)
             ->where('year', $year)
+            ->includedInTotals()
             ->get();
 
         $categoriesIncome = Category::where('user_id', Auth::id())
@@ -37,6 +42,7 @@ class MonthsController extends Controller
                                 ->where('type', 'income')
                                 ->where('month', $month)
                                 ->where('year', $year)
+                                ->includedInTotals()
                                 ->when($request->income_category, function ($q) use ($request) {
                                     $q->where('category_id', $request->income_category);
                                 })
@@ -53,6 +59,7 @@ class MonthsController extends Controller
                                 ->where('type', 'expense')
                                 ->where('month', $month)
                                 ->where('year', $year)
+                                ->includedInTotals()
                                 ->when($request->expense_category, function($q) use ($request) {
                                     $q->where('category_id', $request->expense_category);
                                 })
@@ -150,6 +157,7 @@ class MonthsController extends Controller
     }
 
     public function close(int $year, int $month) {
+        $this->recurrences->ensureMonth(Auth::id(), $year, $month);
         $this->monthlyBalanceService->closeMonth($year, $month);
 
         return back()->with('success', 'Mês fechado com sucesso.');

@@ -16,10 +16,12 @@ class HomeService
 
     public function index(int $anoSelecionado)
     {
+        app(RecurringExpenseService::class)->ensureYear(Auth::id(), $anoSelecionado);
         $meses = Months::MONTHS;
 
         $incomeBalance = Expense::FromUser(Auth::id())
             ->income()
+            ->includedInTotals()
             ->year($anoSelecionado)
             ->get(['month', 'amount'])->groupBy('month')
             ->map(fn ($items) => $items->sum(fn ($item) => Money::cents($item->amount)));
@@ -41,6 +43,7 @@ class HomeService
 
         $expenseBalance = Expense::FromUser(Auth::id())
             ->expense()
+            ->includedInTotals()
             ->year($anoSelecionado)
             ->get(['month', 'amount'])->groupBy('month')
             ->map(fn ($items) => $items->sum(fn ($item) => Money::cents($item->amount)));
