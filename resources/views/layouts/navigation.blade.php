@@ -33,6 +33,10 @@
                         {{ __('Grupos') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('accounts-payable.index')" :active="request()->routeIs('accounts-payable.*')">
+                        {{ __('Contas a pagar') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('pluggy.connections')" :active="request()->routeIs('pluggy.connections*')">
                         {{ __('Conexões') }}
                     </x-nav-link>
@@ -137,6 +141,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.657 1.79-3 4-3s4 1.343 4 3-1.79 3-4 3-4 1.343-4 3 1.79 3 4 3 4-1.343 4-3M4 7v10a2 2 0 002 2h8M4 7a2 2 0 012-2h8M4 7l8 5 4-2.5" />
                 </svg>
                 Conexões
+            </a>
+            <a href="{{ route('accounts-payable.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('accounts-payable.*') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-white hover:text-slate-900' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l2 2 4-4m5.6-2.6a9 9 0 11-12.7 0 9 9 0 0112.7 0z" /></svg>
+                Contas a pagar
             </a>
             <a href="{{ route('pluggy.data-notice') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('pluggy.data-notice') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-white hover:text-slate-900' }}">
