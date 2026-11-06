@@ -47,19 +47,23 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function expenses(): HasMany {
+    public function expenses(): HasMany
+    {
         return $this->hasMany(Expense::class);
     }
 
-    public function groups(): HasMany {
+    public function groups(): HasMany
+    {
         return $this->hasMany(Group::class);
     }
 
-    public function categories(): HasMany {
+    public function categories(): HasMany
+    {
         return $this->hasMany(Category::class);
     }
 
-    public function balances(): HasMany {
+    public function balances(): HasMany
+    {
         return $this->hasMany(MonthlyBalance::class);
     }
 
@@ -91,5 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function recurringExpenses(): HasMany
     {
         return $this->hasMany(RecurringExpense::class);
+    }
+
+    public function accountsPayable(): HasMany
+    {
+        return $this->hasMany(AccountPayable::class);
     }
 }

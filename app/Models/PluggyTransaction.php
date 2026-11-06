@@ -6,21 +6,32 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PluggyTransaction extends Model
 {
     use HasFactory;
 
     public const CLASSIFICATION_INCOME = 'income';
+
     public const CLASSIFICATION_EXPENSE = 'expense';
+
     public const CLASSIFICATION_INTERNAL_TRANSFER = 'internal_transfer';
+
     public const CLASSIFICATION_INTERNAL_RESERVE_TRANSFER = 'internal_reserve_transfer';
+
     public const CLASSIFICATION_CREDIT_CARD_PAYMENT = 'credit_card_payment';
+
     public const CLASSIFICATION_REFUND = 'refund';
+
     public const CLASSIFICATION_CASHBACK = 'cashback';
+
     public const CLASSIFICATION_FEE = 'fee';
+
     public const CLASSIFICATION_INVESTMENT = 'investment_movement';
+
     public const CLASSIFICATION_IGNORED = 'ignored';
+
     public const CLASSIFICATION_UNKNOWN = 'unknown';
 
     protected $fillable = [
@@ -48,11 +59,35 @@ class PluggyTransaction extends Model
         ];
     }
 
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
-    public function connection(): BelongsTo { return $this->belongsTo(PluggyItem::class, 'pluggy_connection_id'); }
-    public function account(): BelongsTo { return $this->belongsTo(PluggyAccount::class, 'pluggy_account_id'); }
-    public function category(): BelongsTo { return $this->belongsTo(Category::class); }
-    public function pairedTransaction(): BelongsTo { return $this->belongsTo(self::class, 'paired_transaction_id'); }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function connection(): BelongsTo
+    {
+        return $this->belongsTo(PluggyItem::class, 'pluggy_connection_id');
+    }
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(PluggyAccount::class, 'pluggy_account_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function pairedTransaction(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'paired_transaction_id');
+    }
+
+    public function payableSettlement(): HasOne
+    {
+        return $this->hasOne(PayableSettlement::class);
+    }
 
     public function scopeContributesToTotals(Builder $query): Builder
     {

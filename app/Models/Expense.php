@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Expense extends Model
 {
@@ -37,11 +37,13 @@ class Expense extends Model
         'recurrence_occurrence_date' => 'date', 'recurrence_is_override' => 'boolean',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo {
+    public function category(): BelongsTo
+    {
         return $this->belongsTo(Category::class);
     }
 
@@ -50,7 +52,15 @@ class Expense extends Model
         return $this->belongsTo(ManualBank::class);
     }
 
-    public function recurringExpense(): BelongsTo { return $this->belongsTo(RecurringExpense::class); }
+    public function recurringExpense(): BelongsTo
+    {
+        return $this->belongsTo(RecurringExpense::class);
+    }
+
+    public function payableSettlement(): HasOne
+    {
+        return $this->hasOne(PayableSettlement::class, 'manual_expense_id');
+    }
 
     public function getBankLabelAttribute(): string
     {
