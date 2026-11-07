@@ -5,18 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExpensesRequest;
 use App\Models\Category;
 use App\Models\Expense;
+use App\Models\ManualBank;
 use App\Services\ExpenseService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Str;
+use App\Services\RecurringExpenseService;
 use App\Support\Money;
 use Carbon\Carbon;
-use App\Models\ManualBank;
-use App\Services\RecurringExpenseService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ExpensesController extends Controller
 {
-
     protected ExpenseService $expenseService;
 
     public function __construct(ExpenseService $expenseService)
@@ -41,10 +39,11 @@ class ExpensesController extends Controller
         $year = $request->year;
         $month = $request->month;
         $categories = Category::where('user_id', Auth::id())
-                    ->where('type', $type)
-                    ->get();
-        
+            ->where('type', $type)
+            ->get();
+
         $banks = ManualBank::where('user_id', Auth::id())->orderBy('name')->get();
+
         return view('expenses.create', compact('type', 'year', 'month', 'categories', 'banks'));
     }
 
@@ -60,9 +59,9 @@ class ExpensesController extends Controller
         $data['month'] = $date->month;
 
         $this->expenseService->create($data);
-        
+
         return redirect()
-            ->route('month.show', [ $data['year'], $data['month']])
+            ->route('month.show', [$data['year'], $data['month']])
             ->with('success', 'Despesa criada com sucesso!');
 
     }
@@ -72,9 +71,13 @@ class ExpensesController extends Controller
      */
     public function show(string $id)
     {
-        $expense = $this->expenseService->show($id);
+        $transaction = $this->expenseService->show($id);
 
-        return view('expenses.show', compact('expense'));
+        return view('transactions.show', [
+            'transaction' => $transaction,
+            'source' => 'manual',
+            'type' => $transaction->type,
+        ]);
     }
 
     /**
@@ -82,7 +85,7 @@ class ExpensesController extends Controller
      */
     public function edit(string $id)
     {
-        
+
         $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
         $type = $expense->type;
         $year = $expense->year;
@@ -99,7 +102,19 @@ class ExpensesController extends Controller
         $recurringExpense = $expense->recurringExpense;
 
         $banks = ManualBank::where('user_id', Auth::id())->orderBy('name')->get();
-        return view('expenses.edit', compact('expense', 'type', 'year', 'month', 'categories', 'groupTotal', 'groupDate', 'banks', 'recurringExpense'));
+
+        return view('transactions.edit', [
+            'transaction' => $expense,
+            'source' => 'manual',
+            'type' => $type,
+            'year' => $year,
+            'month' => $month,
+            'categories' => $categories,
+            'groupTotal' => $groupTotal,
+            'groupDate' => $groupDate,
+            'banks' => $banks,
+            'recurringExpense' => $recurringExpense,
+        ]);
     }
 
     /**
@@ -116,15 +131,15 @@ class ExpensesController extends Controller
         $isRecurring = false;
         $recurringYear = null;
         $recurringMonth = null;
-        if(!empty($data['is_installment'])) {
+        if (! empty($data['is_installment'])) {
             $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
             $data['current_installment'] = $expense->current_installment;
-            if($expense->installments_group && ($data['installment_scope'] ?? 'group') === 'group') {
+            if ($expense->installments_group && ($data['installment_scope'] ?? 'group') === 'group') {
                 $expense = Expense::where('user_id', Auth::id())->where('installments_group', $expense->installments_group)
-                                    ->orderBy('current_installment')->firstOrFail();
+                    ->orderBy('current_installment')->firstOrFail();
             }
         } else {
-             $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
+            $expense = Expense::where('user_id', Auth::id())->findOrFail($id);
         }
 
         if ($expense->recurring_expense_id) {
@@ -132,11 +147,11 @@ class ExpensesController extends Controller
             $recurringYear = $expense->year;
             $recurringMonth = $expense->month;
         }
-        
+
         $this->expenseService->update($expense, $data);
-        
+
         return redirect()
-            ->route('month.show', [ $isRecurring ? $recurringYear : $data['year'], $isRecurring ? $recurringMonth : $data['month']])
+            ->route('month.show', [$isRecurring ? $recurringYear : $data['year'], $isRecurring ? $recurringMonth : $data['month']])
             ->with('success', 'Despesa atualizada com sucesso!');
     }
 
