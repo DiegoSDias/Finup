@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\Expense;
 use App\Models\PluggyAccount;
 use App\Models\PluggyItem;
 use App\Models\PluggyTransaction;
@@ -25,6 +27,7 @@ class PluggyPaymentMethodTest extends TestCase
         $payload = ['id' => 'payment-test', 'description' => 'Compra', 'date' => '2026-09-10',
             'amount' => -100, 'type' => 'DEBIT', 'status' => 'POSTED', 'operationType' => 'CARTAO'];
         app(PluggyTransactionImporter::class)->import($connection, $account, [$payload]);
+
         return [$user, $connection, $account, PluggyTransaction::where('pluggy_transaction_id', 'payment-test')->firstOrFail(), $payload];
     }
 
@@ -109,5 +112,52 @@ class PluggyPaymentMethodTest extends TestCase
         $this->get(route('month.show', [2026, 9]).'?payment_mode=pix')->assertOk()
             ->assertViewHas('typeExpenses', fn ($expenses) => ! $expenses->contains('id', $transaction->id));
         $this->assertSame('debito', $transaction->fresh()->payment_mode);
+    }
+
+    public function test_manual_and_imported_transactions_share_views_and_pluggy_can_create_a_category(): void
+    {
+        [$user, , , $transaction] = $this->imported();
+        $category = Category::create(['user_id' => $user->id, 'name' => 'Moradia', 'type' => 'expense']);
+        $expense = Expense::create([
+            'user_id' => $user->id,
+            'category_id' => $category->id,
+            'date' => '2026-09-10',
+            'month' => 9,
+            'year' => 2026,
+            'type' => 'expense',
+            'description' => 'Manual',
+            'amount' => 80,
+            'payment_mode' => 'pix',
+            'bank_status' => 'none',
+            'is_installment' => false,
+        ]);
+
+        $this->actingAs($user)->withoutVite()->get(route('expenses.show', $expense))->assertOk()->assertViewIs('transactions.show');
+        $this->get(route('expenses.edit', $expense))->assertOk()->assertViewIs('transactions.edit');
+        $this->get(route('pluggy.transactions.show', $transaction))->assertOk()->assertViewIs('transactions.show');
+        $this->get(route('pluggy.transactions.edit', $transaction))->assertOk()->assertViewIs('transactions.edit')->assertSee('+ Criar nova categoria');
+
+        $this->put(route('pluggy.transactions.update', $transaction), [
+            'description' => 'Compra ajustada',
+            'transaction_date' => '2026-09-10',
+            'category_id' => 'new',
+            'new_category' => 'Assinaturas',
+            'payment_method' => 'keep',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $newCategory = Category::query()->where('user_id', $user->id)->where('name', 'Assinaturas')->where('type', 'expense')->sole();
+        $this->assertSame($newCategory->id, $transaction->fresh()->category_id);
+    }
+
+    public function test_month_list_shows_chosen_category_and_institution_for_imported_movements(): void
+    {
+        [$user, $connection, $account, $transaction] = $this->imported();
+        $connection->update(['connector_name' => 'MyPluggy', 'display_name' => 'Instituição Exemplo']);
+        $category = Category::create(['user_id' => $user->id, 'name' => 'Categoria escolhida', 'type' => 'expense']);
+        $transaction->update(['category_id' => $category->id, 'category_source' => 'user', 'pluggy_category_name' => 'Categoria original']);
+
+        $this->actingAs($user)->withoutVite()->get(route('month.show', [2026, 9]))
+            ->assertOk()->assertSee('Categoria escolhida')->assertSee('Instituição Exemplo')
+            ->assertDontSee('Categoria original')->assertDontSee('>Banco</span>', false);
     }
 }

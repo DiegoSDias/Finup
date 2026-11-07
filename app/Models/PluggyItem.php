@@ -20,6 +20,7 @@ class PluggyItem extends Model
         'deleted_at',
         'connector_id',
         'connector_name',
+        'display_name',
         'connector_image_url',
         'status',
         'execution_status',
@@ -41,6 +42,11 @@ class PluggyItem extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getDisplayLabelAttribute(): string
+    {
+        return $this->display_name ?: ($this->connector_name ?: 'Instituição não informada');
     }
 
     public function accounts(): HasMany

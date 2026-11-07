@@ -20,6 +20,7 @@
 
             @if (session('success'))<div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">{{ session('success') }}</div>@endif
             @if (session('warning'))<div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">{{ session('warning') }}</div>@endif
+            @if ($errors->any())<div role="alert" class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">{{ $errors->first() }}</div>@endif
 
             <p id="sync-update-message" class="mb-4 text-sm text-slate-600" role="status" aria-live="polite"></p>
 
@@ -35,10 +36,21 @@
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div class="flex items-center gap-4">
                                     @if ($connection->connector_image_url)<img src="{{ $connection->connector_image_url }}" class="h-11 w-11 rounded-xl" alt="">@else<div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">⌁</div>@endif
-                                    <div><h2 class="font-medium text-slate-900">{{ $connection->connector_name ?? 'Instituição conectada' }}</h2><p class="text-sm text-slate-500">{{ $connection->accounts->count() }} conta(s) · {{ $connection->last_synced_at?->format('d/m/Y H:i') ?? 'Aguardando primeira sincronização' }}</p><p class="mt-1 text-sm text-slate-700">{{ match ($connection->last_sync_status) { 'queued' => 'Aguardando na fila', 'running' => 'Sincronização em andamento', 'awaiting_provider' => 'Aguardando o provedor', 'success' => 'Sincronização concluída', 'partial' => 'Atualização parcial no provedor', 'failed' => 'Sincronização falhou', 'needs_reconnection', 'not_found' => 'Conexão precisa de revisão', 'needs_action' => 'A instituição solicita uma ação', default => 'Estado de sincronização não informado' } }}</p>@if ($connection->last_error)<p class="mt-1 text-sm text-red-600">{{ $connection->last_error }}</p>@endif</div>
+                                    <div><h2 class="font-medium text-slate-900">{{ $connection->display_label }}</h2><p class="text-sm text-slate-500">{{ $connection->accounts->count() }} conta(s) · {{ $connection->last_synced_at?->format('d/m/Y H:i') ?? 'Aguardando primeira sincronização' }}</p><p class="mt-1 text-sm text-slate-700">{{ match ($connection->last_sync_status) { 'queued' => 'Aguardando na fila', 'running' => 'Sincronização em andamento', 'awaiting_provider' => 'Aguardando o provedor', 'success' => 'Sincronização concluída', 'partial' => 'Atualização parcial no provedor', 'failed' => 'Sincronização falhou', 'needs_reconnection', 'not_found' => 'Conexão precisa de revisão', 'needs_action' => 'A instituição solicita uma ação', default => 'Estado de sincronização não informado' } }}</p>@if ($connection->last_error)<p class="mt-1 text-sm text-red-600">{{ $connection->last_error }}</p>@endif</div>
                                 </div>
                                 <div class="flex gap-2"><form method="POST" action="{{ route('pluggy.connections.sync', $connection->id) }}" data-sync-form>@csrf<button @disabled(in_array($connection->last_sync_status, ['queued', 'running'], true)) class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">Sincronizar</button></form><form method="POST" action="{{ route('pluggy.connections.destroy', $connection->id) }}" onsubmit="return confirm('Remover esta conexão do sistema?')">@csrf @method('DELETE')<button class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Remover</button></form></div>
                             </div>
+                            <details class="mt-4 border-t border-slate-100 pt-4">
+                                <summary class="cursor-pointer text-sm font-medium text-blue-700">Editar nome da conexão</summary>
+                                <form method="POST" action="{{ route('pluggy.connections.name', $connection->id) }}" class="mt-3 flex flex-wrap items-end gap-3">
+                                    @csrf @method('PATCH')
+                                    <label class="text-sm text-slate-700">Nome personalizado
+                                        <input name="display_name" value="{{ $connection->display_name }}" maxlength="100" class="mt-1 block rounded-xl border-slate-200" placeholder="Ex.: Mercado Pago">
+                                    </label>
+                                    <button class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white">Salvar nome</button>
+                                    <p class="w-full text-xs text-slate-500">Deixe vazio para usar o nome informado pela Pluggy.</p>
+                                </form>
+                            </details>
                         </section>
                     @endforeach
                 </div>
@@ -59,7 +71,7 @@
                     <div class="mt-5 space-y-3">
                         @foreach ($inactiveConnections as $connection)
                             <div class="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div><p class="font-medium text-slate-800">{{ $connection->connector_name ?? 'Instituição conectada' }}</p><p class="text-sm text-slate-500">{{ $connection->last_error ?? 'Conexão removida desta aplicação.' }}</p></div>
+                                <div><p class="font-medium text-slate-800">{{ $connection->display_label }}</p><p class="text-sm text-slate-500">{{ $connection->last_error ?? 'Conexão removida desta aplicação.' }}</p></div>
                                 <form method="POST" action="{{ route('pluggy.connections.reactivate', $connection->id) }}">@csrf<button class="rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-medium text-blue-700 hover:bg-blue-50">Reativar</button></form>
                             </div>
                         @endforeach

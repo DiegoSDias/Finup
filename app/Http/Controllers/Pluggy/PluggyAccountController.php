@@ -127,6 +127,15 @@ class PluggyAccountController extends Controller
         return response()->json(['message' => 'Conexão bancária registrada e sincronização agendada.'], 201);
     }
 
+    public function updateName(Request $request, int $connection): \Illuminate\Http\RedirectResponse
+    {
+        $item = $request->user()->pluggyItems()->where('is_active', true)->findOrFail($connection);
+        $validated = $request->validate(['display_name' => ['nullable', 'string', 'max:100']]);
+        $item->update(['display_name' => trim($validated['display_name'] ?? '') ?: null]);
+
+        return redirect()->route('pluggy.connections')->with('success', 'Nome da conexão atualizado.');
+    }
+
     public function sync(Request $request, int $connection): \Illuminate\Http\RedirectResponse
     {
         $item = $request->user()->pluggyItems()->where('is_active', true)->findOrFail($connection);

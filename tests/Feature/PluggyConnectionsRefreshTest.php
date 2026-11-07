@@ -54,4 +54,20 @@ class PluggyConnectionsRefreshTest extends TestCase
     {
         $this->post(route('pluggy.connections.sync-all'))->assertRedirect(route('login'));
     }
+
+    public function test_owner_can_set_and_clear_connection_name_without_changing_provider_name(): void
+    {
+        $user = User::factory()->create();
+        $connection = PluggyItem::factory()->create(['user_id' => $user->id, 'is_active' => true, 'connector_name' => 'MyPluggy']);
+        $other = User::factory()->create();
+
+        $this->actingAs($other)->patch(route('pluggy.connections.name', $connection), ['display_name' => 'Outro'])->assertNotFound();
+        $this->actingAs($user)->patch(route('pluggy.connections.name', $connection), ['display_name' => ' Mercado Pago '])->assertSessionHasNoErrors();
+        $this->assertSame('Mercado Pago', $connection->fresh()->display_label);
+        $this->assertSame('MyPluggy', $connection->fresh()->connector_name);
+        $this->withoutVite()->get(route('pluggy.connections'))->assertSee('Mercado Pago');
+        $this->patch(route('pluggy.connections.name', $connection), ['display_name' => str_repeat('a', 101)])->assertSessionHasErrors('display_name');
+        $this->patch(route('pluggy.connections.name', $connection), ['display_name' => ''])->assertSessionHasNoErrors();
+        $this->assertSame('MyPluggy', $connection->fresh()->display_label);
+    }
 }

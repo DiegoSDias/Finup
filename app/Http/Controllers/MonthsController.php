@@ -78,7 +78,10 @@ class MonthsController extends Controller
                                 ->orderBy('date')
                                 ->get();
 
-        $importedBase = PluggyTransaction::with(['category' => fn ($query) => $query->where('user_id', Auth::id())])
+        $importedBase = PluggyTransaction::with([
+            'category' => fn ($query) => $query->where('user_id', Auth::id()),
+            'connection' => fn ($query) => $query->where('user_id', Auth::id()),
+        ])
             ->where('user_id', Auth::id())
             ->forMonth((int) $year, (int) $month)
             ->whereNull('removed_at')

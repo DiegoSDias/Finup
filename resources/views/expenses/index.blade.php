@@ -91,7 +91,7 @@
                                             <span class="text-slate-400 text-xs">—</span>
                                         @endif
                                         @if($income instanceof \App\Models\PluggyTransaction)
-                                            <span class="ml-2 inline-flex px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700">Banco</span>
+                                            <span class="block text-xs text-slate-500 mt-1">{{ $income->connection?->display_label ?? 'Instituição não informada' }}</span>
                                         @else
                                             <span class="block text-xs text-slate-500 mt-1">{{ $income->bank_label }}</span>
                                         @endif
@@ -207,7 +207,7 @@
                                             <span class="ml-2 inline-flex px-2 py-1 rounded-lg text-xs font-medium bg-violet-50 text-violet-700">Recorrente</span>
                                         @endif
                                         @if($expense instanceof \App\Models\PluggyTransaction)
-                                            <span class="ml-2 inline-flex px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700">Banco</span>
+                                            <span class="block text-xs text-slate-500 mt-1">{{ $expense->connection?->display_label ?? 'Instituição não informada' }}</span>
                                         @else
                                             <span class="block text-xs text-slate-500 mt-1">{{ $expense->bank_label }}</span>
                                         @endif

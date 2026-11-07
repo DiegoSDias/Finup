@@ -59,6 +59,7 @@ Route::middleware('auth')->group( function() {
     Route::delete('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'destroy'])->name('pluggy.transactions.destroy');
     Route::get('/pluggy/accounts', [PluggyAccountController::class, 'index'])->name('pluggy.accounts.index');
     Route::get('/pluggy/connections', [PluggyAccountController::class, 'connections'])->name('pluggy.connections');
+    Route::patch('/pluggy/connections/{connection}/name', [PluggyAccountController::class, 'updateName'])->name('pluggy.connections.name');
     Route::post('/pluggy/connections/sync-all', [PluggyAccountController::class, 'syncAll'])->name('pluggy.connections.sync-all');
     Route::view('/pluggy/sobre-os-dados', 'pluggy.data-notice')->name('pluggy.data-notice');
     Route::post('/pluggy/connections/{connection}/sync', [PluggyAccountController::class, 'sync'])->name('pluggy.connections.sync');
