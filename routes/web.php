@@ -53,6 +53,7 @@ Route::middleware('auth')->group( function() {
     Route::post('/pluggy/transaction-rules', [PluggyTransactionRuleController::class, 'store'])->name('pluggy.transaction-rules.store');
     Route::patch('/pluggy/transaction-rules/{rule}', [PluggyTransactionRuleController::class, 'update'])->name('pluggy.transaction-rules.update');
     Route::delete('/pluggy/transaction-rules/{rule}', [PluggyTransactionRuleController::class, 'destroy'])->name('pluggy.transaction-rules.destroy');
+    Route::post('/pluggy/transactions/{transaction}/restore-phrase', [PluggyTransactionRuleController::class, 'restore'])->name('pluggy.transactions.restore-phrase');
     Route::get('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'show'])->name('pluggy.transactions.show');
     Route::get('/pluggy/transactions/{transaction}/edit', [PluggyTransactionController::class, 'edit'])->name('pluggy.transactions.edit');
     Route::put('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'update'])->name('pluggy.transactions.update');

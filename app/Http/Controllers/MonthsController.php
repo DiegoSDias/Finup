@@ -117,7 +117,7 @@ class MonthsController extends Controller
             ->get();
 
         $excludedTransactions = (clone $importedBase)
-            ->where('affects_totals', false)
+            ->whereIn('exclusion_reason', ['user_exclusion_phrase', 'user_transfer_phrase'])
             ->orderByDesc('transaction_date')
             ->get();
 

@@ -41,6 +41,7 @@ class PluggyAccountController extends Controller
                 ->latest()
                 ->get(),
             'transactionRules' => $request->user()->pluggyTransactionRules()
+                ->with(['connection' => fn ($query) => $query->where('user_id', $request->user()->id)])
                 ->latest()
                 ->get(),
             'error' => null,

@@ -1,5 +1,6 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        @if (session('success'))<div role="status" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">{{ session('success') }}</div>@endif
 
         <x-back-button />
         
@@ -306,6 +307,7 @@
                             @endphp
                             <div><p class="font-medium text-slate-800">{{ $transaction->description }}</p><p class="text-sm text-slate-500">{{ $transaction->transaction_date->format('d/m/Y') }} · {{ $reason }}</p></div>
                             <span class="font-semibold text-slate-700">R$ {{ number_format($transaction->amount, 2, ',', '.') }}</span>
+                            <form method="POST" action="{{ route('pluggy.transactions.restore-phrase', $transaction) }}">@csrf<button class="rounded-xl border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700">Restaurar</button></form>
                         </div>
                     @endforeach
                 </div>

@@ -89,6 +89,7 @@
                 <form method="POST" action="{{ route('pluggy.transaction-rules.store') }}" class="mt-5 grid gap-3 md:grid-cols-[1fr_230px_auto]">
                     @csrf
                     <input name="phrase" required minlength="3" maxlength="150" value="{{ old('phrase') }}" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex.: Dinheiro reservado Guardar Dinheiro">
+                    <select name="pluggy_connection_id" required class="rounded-xl border-slate-200 text-sm"><option value="">Escolha uma conexão</option>@foreach ($connections as $connection)<option value="{{ $connection->id }}">{{ $connection->display_label }}</option>@endforeach</select>
                     <select name="action" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="{{ \App\Models\PluggyTransactionRule::ACTION_EXCLUDE }}">Não contabilizar nos totais</option>
                         <option value="{{ \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER }}">Transferência entre minhas contas</option>
@@ -104,10 +105,11 @@
                             <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <p class="font-medium text-slate-800">“{{ $rule->phrase }}”</p>
+                                    <p class="text-sm text-slate-500">{{ $rule->connection?->display_label ?? 'Todas as conexões (regra anterior)' }} @if($rule->ends_before) · Válida até {{ $rule->ends_before->copy()->subDay()->format('d/m/Y') }} @endif</p>
                                     <p class="mt-1 text-sm text-slate-500">{{ $rule->action === \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER ? 'Transferência própria: não entra como receita nem despesa.' : 'Excluída dos totais financeiros.' }}</p>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <details class="relative">
+                                    @if (! $rule->ends_before)<details class="relative">
                                         <summary class="cursor-pointer list-none rounded-xl border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50">Editar</summary>
                                         <form method="POST" action="{{ route('pluggy.transaction-rules.update', $rule) }}" class="absolute right-0 z-10 mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
                                             @csrf @method('PATCH')
@@ -121,10 +123,12 @@
                                             <button class="mt-3 w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Salvar regra</button>
                                         </form>
                                     </details>
-                                    <form method="POST" action="{{ route('pluggy.transaction-rules.destroy', $rule) }}" onsubmit="return confirm('Remover esta regra e recalcular as movimentações?')">
+                                    <form method="POST" action="{{ route('pluggy.transaction-rules.destroy', $rule) }}" onsubmit="return confirm('Encerrar esta regra a partir da data escolhida e recalcular as movimentações?')">
                                         @csrf @method('DELETE')
-                                        <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Remover</button>
+                                        <label class="text-xs text-slate-600">Encerrar a partir de <input type="date" name="ends_before" required class="rounded-lg border-slate-200 text-sm"></label>
+                                        <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Encerrar regra</button>
                                     </form>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
