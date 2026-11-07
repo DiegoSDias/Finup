@@ -24,6 +24,7 @@ class InternalTransferMatcher
             ->whereIn('direction', ['DEBIT', 'CREDIT'])
             ->whereNull('paired_transaction_id')
             ->where('is_internal_transfer', false)
+            ->where(fn ($query) => $query->whereNull('exclusion_reason')->orWhereNotIn('exclusion_reason', ['user_exclusion_phrase', 'user_transfer_phrase']))
             ->orderByDesc('transaction_date')
             ->get();
 

@@ -37,13 +37,17 @@ class PluggyTransactionImporter
                 }
 
                 $description = mb_substr((string) ($transaction['description'] ?? 'Movimentação bancária'), 0, 500);
+                $existing = $this->findExisting($connection->user_id, $account, $transaction);
+                $effectiveDate = $existing?->user_modified_date ? $existing->transaction_date->toDateString() : $this->date($transaction['date'] ?? null)->toDateString();
                 $classification = $this->ruleService->apply(
                     $connection->user_id,
                     $description,
                     $transaction['descriptionRaw'] ?? null,
                     $this->classifier->classify($transaction, $account->type),
+                    $connection->id,
+                    $effectiveDate,
+                    (bool) $existing?->phrase_rules_restored,
                 );
-                $existing = $this->findExisting($connection->user_id, $account, $transaction);
                 // Uma exclusão feita pelo usuário é local e deve sobreviver às próximas sincronizações.
                 if ($existing?->deleted_by_user_at) {
                     $updated++;
@@ -81,7 +85,7 @@ class PluggyTransactionImporter
                     'operation_type' => $transaction['operationType'] ?? null,
                     'classification' => $classification['classification'],
                     'affects_totals' => $affectsTotals,
-                    'exclusion_reason' => $affectsTotals ? null : ($status === 'POSTED' ? $classification['exclusion_reason'] : 'pending'),
+                    'exclusion_reason' => $affectsTotals ? null : (in_array($classification['exclusion_reason'], ['user_exclusion_phrase', 'user_transfer_phrase'], true) ? $classification['exclusion_reason'] : ($status === 'POSTED' ? $classification['exclusion_reason'] : 'pending')),
                     'payment_method' => $existing?->user_modified_payment_method ? $existing->payment_method : $classification['payment_method'],
                     'pluggy_category_id' => $transaction['categoryId'] ?? null,
                     'pluggy_category_name' => $transaction['category'] ?? null,

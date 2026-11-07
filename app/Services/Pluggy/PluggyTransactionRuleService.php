@@ -23,9 +23,9 @@ class PluggyTransactionRuleService
      * @param array{classification: string, affects_totals: bool, payment_method: string} $classification
      * @return array{classification: string, affects_totals: bool, payment_method: string, exclusion_reason: ?string, is_internal_transfer: bool}
      */
-    public function apply(int $userId, string $description, ?string $descriptionRaw, array $classification): array
+    public function apply(int $userId, string $description, ?string $descriptionRaw, array $classification, ?int $connectionId = null, ?string $date = null, bool $restored = false): array
     {
-        $rule = $this->matchingRule($userId, $description, $descriptionRaw);
+        $rule = $restored ? null : $this->matchingRule($userId, $description, $descriptionRaw, $connectionId, $date);
 
         if (! $rule) {
             return [
@@ -62,9 +62,12 @@ class PluggyTransactionRuleService
                     $base = $this->classifier->classify($payload, $transaction->account?->type ?? 'BANK');
                     $resolved = $this->apply(
                         $userId,
-                        $transaction->description,
+                        $payload['description'] ?? $transaction->description,
                         $transaction->description_raw,
                         $base,
+                        $transaction->pluggy_connection_id,
+                        $transaction->transaction_date->toDateString(),
+                        $transaction->phrase_rules_restored,
                     );
 
                     $status = strtoupper((string) $transaction->status);
@@ -77,7 +80,7 @@ class PluggyTransactionRuleService
                     $transaction->update([
                         'classification' => $resolved['classification'],
                         'affects_totals' => $affectsTotals,
-                        'exclusion_reason' => $affectsTotals ? null : ($status === 'POSTED' ? $resolved['exclusion_reason'] : 'pending'),
+                        'exclusion_reason' => $affectsTotals ? null : (in_array($resolved['exclusion_reason'], ['user_exclusion_phrase', 'user_transfer_phrase'], true) ? $resolved['exclusion_reason'] : ($status === 'POSTED' ? $resolved['exclusion_reason'] : 'pending')),
                         'is_internal_transfer' => $resolved['is_internal_transfer'],
                         'paired_transaction_id' => null,
                     ]);
@@ -91,13 +94,15 @@ class PluggyTransactionRuleService
         app(MonthlyBalanceService::class)->recalculateClosedFrom($userId, 0, 1);
     }
 
-    private function matchingRule(int $userId, string $description, ?string $descriptionRaw): ?PluggyTransactionRule
+    private function matchingRule(int $userId, string $description, ?string $descriptionRaw, ?int $connectionId, ?string $date): ?PluggyTransactionRule
     {
         $haystack = $this->normalize($description . ' ' . ($descriptionRaw ?? ''));
 
         return $this->rulesForUser($userId)
             ->sortByDesc(fn (PluggyTransactionRule $rule) => mb_strlen($rule->phrase))
-            ->first(fn (PluggyTransactionRule $rule) => str_contains($haystack, $this->normalize($rule->phrase)));
+            ->first(fn (PluggyTransactionRule $rule) => ($rule->pluggy_connection_id === null || $rule->pluggy_connection_id === $connectionId)
+                && ($rule->ends_before === null || ($date !== null && $date < $rule->ends_before->toDateString()))
+                && str_contains($haystack, $this->normalize($rule->phrase)));
     }
 
     /** @return Collection<int, PluggyTransactionRule> */
