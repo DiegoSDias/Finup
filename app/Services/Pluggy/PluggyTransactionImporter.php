@@ -15,6 +15,7 @@ class PluggyTransactionImporter
         private readonly PluggyTransactionClassifier $classifier,
         private readonly PluggyCategoryMapper $categoryMapper,
         private readonly PluggyTransactionRuleService $ruleService,
+        private readonly PluggyCategoryRuleService $categoryRules,
     ) {
     }
 
@@ -54,13 +55,11 @@ class PluggyTransactionImporter
                     continue;
                 }
 
-                $categoryId = $existing?->category_source === 'user'
-                    ? $existing->category_id
-                    : $this->categoryMapper->resolve(
-                        $connection->user_id,
-                        $this->categoryType($classification['classification']),
-                        $transaction['category'] ?? null,
-                    );
+                $manualCategory = $existing && ($existing->user_modified_category || $existing->category_source === 'user');
+                $categoryId = $manualCategory ? $existing->category_id : $this->categoryRules->resolve(
+                    $connection->user_id, $description, $transaction['descriptionRaw'] ?? null, $effectiveDate,
+                    $this->categoryType($this->classifier->classify($transaction, $account->type)['classification']),
+                );
 
                 $metadata = $transaction['creditCardMetadata'] ?? [];
                 $status = strtoupper((string) ($transaction['status'] ?? 'POSTED'));
@@ -89,8 +88,8 @@ class PluggyTransactionImporter
                     'payment_method' => $existing?->user_modified_payment_method ? $existing->payment_method : $classification['payment_method'],
                     'pluggy_category_id' => $transaction['categoryId'] ?? null,
                     'pluggy_category_name' => $transaction['category'] ?? null,
-                    'category_id' => $existing?->user_modified_category ? $existing->category_id : $categoryId,
-                    'category_source' => $existing?->category_source ?? 'pluggy',
+                    'category_id' => $categoryId,
+                    'category_source' => $manualCategory ? 'user' : ($categoryId ? 'rule' : 'pluggy'),
                     'is_installment' => (int) ($metadata['totalInstallments'] ?? 0) > 1,
                     'current_installment' => $metadata['installmentNumber'] ?? null,
                     'total_installments' => $metadata['totalInstallments'] ?? null,

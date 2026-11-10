@@ -12,6 +12,7 @@ use App\Http\Controllers\Pluggy\PluggyController;
 use App\Http\Controllers\Pluggy\PluggyAccountController;
 use App\Http\Controllers\Pluggy\PluggyWebhookController;
 use App\Http\Controllers\Pluggy\PluggyTransactionRuleController;
+use App\Http\Controllers\Pluggy\PluggyCategoryRuleController;
 use App\Http\Controllers\Pluggy\PluggyTransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,9 @@ Route::middleware('auth')->group( function() {
     Route::post('/pluggy/connect-token', [PluggyController::class, 'connectToken'])->name('pluggy.connect-token');
     Route::post('/pluggy/items', [PluggyAccountController::class, 'store'])->name('pluggy.items.store');
     Route::post('/pluggy/transaction-rules', [PluggyTransactionRuleController::class, 'store'])->name('pluggy.transaction-rules.store');
+    Route::post('/pluggy/category-rules', [PluggyCategoryRuleController::class, 'store'])->name('pluggy.category-rules.store');
+    Route::patch('/pluggy/category-rules/{rule}', [PluggyCategoryRuleController::class, 'update'])->name('pluggy.category-rules.update');
+    Route::delete('/pluggy/category-rules/{rule}', [PluggyCategoryRuleController::class, 'destroy'])->name('pluggy.category-rules.destroy');
     Route::patch('/pluggy/transaction-rules/{rule}', [PluggyTransactionRuleController::class, 'update'])->name('pluggy.transaction-rules.update');
     Route::delete('/pluggy/transaction-rules/{rule}', [PluggyTransactionRuleController::class, 'destroy'])->name('pluggy.transaction-rules.destroy');
     Route::post('/pluggy/transactions/{transaction}/restore-phrase', [PluggyTransactionRuleController::class, 'restore'])->name('pluggy.transactions.restore-phrase');

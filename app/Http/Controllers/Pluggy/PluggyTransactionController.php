@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\PluggyTransaction;
 use App\Services\MonthlyBalanceService;
 use App\Services\Pluggy\PluggyTransactionClassifier;
+use App\Services\Pluggy\PluggyCategoryRuleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +67,7 @@ class PluggyTransactionController extends Controller
             'new_category' => ['nullable', 'required_if:category_id,new', 'string', 'max:100'],
             'payment_method' => ['sometimes', 'required', 'in:keep,auto,pix,card,debito,credito,dinheiro,other'],
             'restore_automatic' => ['sometimes', 'boolean'],
+            'confirm_category' => ['sometimes', 'boolean'],
         ]);
 
         if ($validated['category_id'] !== null && $validated['category_id'] !== 'new' && (! ctype_digit((string) $validated['category_id']) || ! Category::query()
@@ -88,15 +90,19 @@ class PluggyTransactionController extends Controller
                     'type' => $categoryType,
                 ])->id;
             }
+            $effectiveCategoryId = $transaction->category_source === 'pluggy' && ! $transaction->user_modified_category ? null : $transaction->category_id;
+            $categoryChanged = ! empty($validated['confirm_category']) || $validated['category_id'] === 'new' || (string) ($categoryId ?? '') !== (string) ($effectiveCategoryId ?? '');
             $changes = [
                 'description' => trim($validated['description']),
                 'transaction_date' => $validated['transaction_date'],
-                'category_id' => $categoryId,
-                'category_source' => 'user',
                 'user_modified_description' => true,
                 'user_modified_date' => true,
-                'user_modified_category' => true,
             ];
+            if ($categoryChanged) {
+                $changes['category_id'] = $categoryId;
+                $changes['category_source'] = 'user';
+                $changes['user_modified_category'] = true;
+            }
             $currentMethod = in_array($transaction->payment_method, ['pix', 'card', 'debito', 'credito', 'dinheiro'], true)
                 ? $transaction->payment_method : 'other';
             $automatic = (bool) ($validated['restore_automatic'] ?? false) || ($validated['payment_method'] ?? null) === 'auto';
@@ -113,6 +119,13 @@ class PluggyTransactionController extends Controller
                 $changes['user_modified_payment_method'] = ! $automatic;
             }
             $transaction->update($changes);
+            if (! $transaction->user_modified_category && $transaction->category_source !== 'user') {
+                $payload = $transaction->raw_payload ?? [];
+                $ruleCategory = app(PluggyCategoryRuleService::class)->resolve($request->user()->id,
+                    $payload['description'] ?? $transaction->description, $transaction->description_raw,
+                    $transaction->transaction_date->toDateString(), ($payload ? app(PluggyTransactionClassifier::class)->classify($payload, $transaction->account?->type ?? 'BANK')['classification'] : $transaction->classification) === PluggyTransaction::CLASSIFICATION_INCOME ? 'income' : 'expense');
+                $transaction->update(['category_id' => $ruleCategory, 'category_source' => $ruleCategory ? 'rule' : 'pluggy']);
+            }
             app(MonthlyBalanceService::class)->recalculateClosedFrom($request->user()->id, 0, 1);
 
             return $transaction;

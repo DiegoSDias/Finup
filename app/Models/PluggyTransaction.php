@@ -137,6 +137,14 @@ class PluggyTransaction extends Model
         };
     }
 
+    public function getCategoryLabelAttribute(): string
+    {
+        if ($this->user_modified_category || in_array($this->category_source, ['user', 'rule'], true)) {
+            return $this->category?->name ?? 'Sem categoria';
+        }
+        return $this->pluggy_category_name ?: 'Sem categoria';
+    }
+
     public function getPaymentLabelAttribute(): string
     {
         return match ($this->payment_method) {
