@@ -10,7 +10,9 @@ O ambiente de desenvolvimento conta com PHP 8.3, Nginx, MySQL 8.4 e um worker pa
 2. Defina uma chave da aplicação em `APP_KEY` no `.env` (ou use `php artisan key:generate` uma única vez antes de subir os contêineres).
 3. Inicie o ambiente: `docker compose up --build`.
 
-A aplicação estará disponível em `http://localhost:8080`. As migrations são aplicadas ao iniciar o serviço `app`, e o serviço `queue` processa os jobs em segundo plano. O MySQL também fica acessível no host pela porta `3307` com banco, usuário e senha `finup`.
+A aplicação estará disponível em `http://localhost:8080`. As migrations são aplicadas ao iniciar o serviço `app`, e o serviço `queue` processa os jobs em segundo plano. O MySQL também fica acessível no host pela porta `3309` com banco, usuário e senha `finup`.
+
+O worker usa tempo limite padrão de 240 segundos, alinhado aos jobs da Pluggy. O `retry_after` da fila de banco deve permanecer maior que esse tempo (o padrão é 300 segundos). O código é incorporado às imagens: após alterá-lo, execute `docker compose up --build` para reconstruí-las. O banco Docker é separado do banco local; apenas seus dados no volume `mysql-data` são persistidos entre recriações dos contêineres. Arquivos e logs armazenados dentro dos contêineres não possuem volume persistente configurado.
 
 Para interromper os serviços, use `docker compose down`. Para remover também os dados locais do banco, use `docker compose down --volumes`.
 
