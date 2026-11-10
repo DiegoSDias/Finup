@@ -2,6 +2,18 @@
 
 Aplicação Laravel para controle de receitas e despesas manuais, com integração opcional de Open Finance pela Pluggy. As informações bancárias são buscadas pela Pluggy e persistidas no banco local antes de serem exibidas nos relatórios.
 
+## Executar com Docker
+
+O ambiente de desenvolvimento conta com PHP 8.3, Nginx, MySQL 8.4 e um worker para a fila de sincronização. O banco é mantido no volume Docker `mysql-data`.
+
+1. Crie o arquivo de ambiente, caso ainda não exista: `Copy-Item .env.example .env`.
+2. Defina uma chave da aplicação em `APP_KEY` no `.env` (ou use `php artisan key:generate` uma única vez antes de subir os contêineres).
+3. Inicie o ambiente: `docker compose up --build`.
+
+A aplicação estará disponível em `http://localhost:8080`. As migrations são aplicadas ao iniciar o serviço `app`, e o serviço `queue` processa os jobs em segundo plano. O MySQL também fica acessível no host pela porta `3307` com banco, usuário e senha `finup`.
+
+Para interromper os serviços, use `docker compose down`. Para remover também os dados locais do banco, use `docker compose down --volumes`.
+
 ## O que a integração faz
 
 - Abre o Pluggy Connect sem expor `PLUGGY_CLIENT_SECRET` ao navegador.
