@@ -80,6 +80,38 @@
             @endif
 
             <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xl font-medium text-slate-900">Categorias por descrição</h2>
+                <p class="mt-1 text-sm text-slate-500">A regra vale para todas as conexões e preserva categorias escolhidas individualmente. Regras mais específicas têm prioridade.</p>
+                <form method="POST" action="{{ route('pluggy.category-rules.store') }}" class="mt-4 flex flex-wrap items-end gap-3" x-data="{ newCategory: @js(old('category_id') === 'new') }">
+                    @csrf
+                    <label class="text-sm text-slate-700">Descrição contém<input name="phrase" value="{{ old('phrase') }}" required minlength="3" maxlength="150" class="mt-1 block rounded-xl border-slate-200" placeholder="Ex.: Uber"></label>
+                    <label class="text-sm text-slate-700">Categoria<select name="category_id" required class="mt-1 block rounded-xl border-slate-200" @change="newCategory = $event.target.value === 'new'"><option value="">Selecione</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected((string) old('category_id') === (string) $category->id)>{{ $category->name }} ({{ $category->type === 'income' ? 'receita' : 'despesa' }})</option>@endforeach<option value="new" @selected(old('category_id') === 'new')>+ Criar nova categoria</option></select></label>
+                    <label x-cloak x-show="newCategory" class="text-sm text-slate-700">Nome da nova categoria<input name="new_category" value="{{ old('new_category') }}" maxlength="100" :required="newCategory" class="mt-1 block rounded-xl border-slate-200" placeholder="Ex.: Transporte"></label>
+                    <label x-cloak x-show="newCategory" class="text-sm text-slate-700">Tipo<select name="new_category_type" :required="newCategory" class="mt-1 block rounded-xl border-slate-200"><option value="">Selecione</option><option value="expense" @selected(old('new_category_type') === 'expense')>Despesa</option><option value="income" @selected(old('new_category_type') === 'income')>Receita</option></select></label>
+                    <label class="text-sm text-slate-700">Válida a partir de (opcional)<input type="date" name="starts_on" value="{{ old('starts_on') }}" class="mt-1 block rounded-xl border-slate-200"></label>
+                    <button class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white">Criar regra</button>
+                </form>
+                <div class="mt-5 space-y-3">
+                    @foreach($categoryRules as $rule)
+                        <div class="rounded-xl border border-slate-200 p-4">
+                            <p class="font-medium">{{ $rule->phrase }} → {{ $rule->category?->name ?? 'Categoria indisponível' }}</p>
+                            <p class="text-sm text-slate-500">Início: {{ $rule->starts_on?->format('d/m/Y') ?? 'todo o histórico' }} · Encerramento: {{ $rule->ends_before?->format('d/m/Y') ?? 'sem data' }} (dia não incluído)</p>
+                            <details class="mt-2"><summary class="cursor-pointer text-sm text-blue-700">Editar regra</summary>
+                                <form method="POST" action="{{ route('pluggy.category-rules.update', $rule) }}" class="mt-2 flex flex-wrap gap-2">@csrf @method('PATCH')
+                                    <input name="phrase" value="{{ $rule->phrase }}" required minlength="3" maxlength="150" class="rounded-lg border-slate-200">
+                                    <select name="category_id" required class="rounded-lg border-slate-200">@foreach($categories as $category)<option value="{{ $category->id }}" @selected($rule->category_id === $category->id)>{{ $category->name }} ({{ $category->type === 'income' ? 'receita' : 'despesa' }})</option>@endforeach</select>
+                                    <input type="date" name="starts_on" value="{{ $rule->starts_on?->format('Y-m-d') }}" class="rounded-lg border-slate-200"><button class="rounded-lg bg-blue-600 px-3 py-2 text-white">Salvar</button>
+                                </form>
+                            </details>
+                            <form method="POST" action="{{ route('pluggy.category-rules.destroy', $rule) }}" class="mt-3 flex flex-wrap items-end gap-2" onsubmit="return confirm('Reavaliar as categorias afetadas por esta alteração?')">@csrf @method('DELETE')
+                                <label class="text-sm">Encerrar a partir de <input type="date" name="ends_before" class="rounded-lg border-slate-200"></label><button name="mode" value="end" class="rounded-lg border px-3 py-2 text-sm">Encerrar</button><button name="mode" value="delete" class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700">Excluir regra e reavaliar histórico</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="max-w-3xl">
                     <p class="text-sm font-medium uppercase tracking-widest text-blue-600">Regras de movimentação</p>
                     <h2 class="mt-1 text-xl font-medium text-slate-900">Excluir por frase</h2>

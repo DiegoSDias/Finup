@@ -84,7 +84,9 @@
                             @foreach ($typeIncomes as $income)
                                 <tr class="hover:bg-emerald-50/30 transition-colors group">
                                     <td class="px-6 py-4 items-center">
-                                        @if($income->category)
+                                        @if($income instanceof \App\Models\PluggyTransaction)
+                                            <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">{{ $income->category_label }}</span>
+                                        @elseif($income->category)
                                             <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
                                                 {{ $income->category->name }}
                                             </span>
@@ -197,7 +199,9 @@
                             @foreach ($typeExpenses as $expense)
                                 <tr class="hover:bg-rose-50/30 transition-colors group">
                                     <td class="px-6 py-4">
-                                        @if($expense->category)
+                                        @if($expense instanceof \App\Models\PluggyTransaction)
+                                            <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">{{ $expense->category_label }}</span>
+                                        @elseif($expense->category)
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
                                                 {{ $expense->category->name }}
                                             </span>

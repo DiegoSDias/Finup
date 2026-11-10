@@ -44,6 +44,8 @@ class PluggyAccountController extends Controller
                 ->with(['connection' => fn ($query) => $query->where('user_id', $request->user()->id)])
                 ->latest()
                 ->get(),
+            'categoryRules' => \App\Models\PluggyCategoryRule::query()->where('user_id', $request->user()->id)->with('category')->latest()->get(),
+            'categories' => $request->user()->categories()->orderBy('name')->get(),
             'error' => null,
         ]);
     }

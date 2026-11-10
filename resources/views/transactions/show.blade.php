@@ -21,7 +21,7 @@
                     <div class="sm:col-span-2"><dt class="text-sm font-medium text-slate-500">Descrição</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $transaction->description }}</dd></div>
                     <div><dt class="text-sm font-medium text-slate-500">Data</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $date->format('d/m/Y') }}</dd></div>
                     <div><dt class="text-sm font-medium text-slate-500">Valor</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 font-semibold {{ $isIncome ? 'text-emerald-700' : 'text-rose-700' }}">R$ {{ number_format($amount, 2, ',', '.') }}</dd></div>
-                    <div><dt class="text-sm font-medium text-slate-500">Categoria</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $transaction->category?->name ?? 'Sem categoria' }}</dd></div>
+                    <div><dt class="text-sm font-medium text-slate-500">Categoria</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $isPluggy ? $transaction->category_label : ($transaction->category?->name ?? 'Sem categoria') }}</dd></div>
                     @if ($isPluggy)
                         <div><dt class="text-sm font-medium text-slate-500">Conta</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $transaction->account?->name ?? '—' }}</dd></div>
                         <div><dt class="text-sm font-medium text-slate-500">Forma de pagamento</dt><dd class="mt-1 rounded-xl bg-slate-50 p-3 text-slate-900">{{ $transaction->payment_label }} <span class="text-xs text-slate-500">({{ $transaction->user_modified_payment_method ? 'definida por você' : 'classificação automática' }})</span></dd></div>
