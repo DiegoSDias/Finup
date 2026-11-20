@@ -5,10 +5,10 @@
         $creditBalance = $accounts->where('type', 'CREDIT')->sum('balance');
     @endphp
 
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 sm:p-8">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-10">
-                <div><p class="text-sm font-medium uppercase tracking-widest text-blue-600 mb-2">Open Finance</p><h1 class="text-4xl font-light tracking-tight text-slate-900">Minhas conexões</h1><p class="mt-2 text-slate-500">Dados sincronizados localmente pela Pluggy.</p></div>
+    <div class="finup-page finup-connections">
+        <div class="finup-page-inner">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between finup-page-heading">
+                <div><h1 class="text-4xl font-light tracking-tight text-slate-900">Minhas <span>Conexões</span></h1><p class="finup-page-intro">Dados sincronizados localmente pela Pluggy.</p></div>
                 <div class="flex flex-wrap gap-3">
                     @if ($connections->isNotEmpty())
                         <form method="POST" action="{{ route('pluggy.connections.sync-all') }}" data-sync-form>@csrf<button class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Sincronizar todos</button></form>
@@ -22,15 +22,17 @@
             @if (session('warning'))<div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">{{ session('warning') }}</div>@endif
             @if ($errors->any())<div role="alert" class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">{{ $errors->first() }}</div>@endif
 
+            @include('pluggy._connect')
+
             <p id="sync-update-message" class="mb-4 text-sm text-slate-600" role="status" aria-live="polite"></p>
 
             <div id="connection-overview">
             @if ($connections->isEmpty())
-                <div class="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center shadow-sm"><h2 class="text-xl font-medium text-slate-900">Nenhuma conexão vinculada</h2><p class="mx-auto mt-2 max-w-md text-slate-500">Vincule um Item ID já existente ou conecte uma nova instituição no painel.</p><a href="{{ route('dashboard') }}" class="mt-6 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Ir para o painel</a></div>
+                <div class="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center shadow-sm"><h2 class="text-xl font-medium text-slate-900">Nenhuma conexão vinculada</h2><p class="mx-auto mt-2 max-w-md text-slate-500">Conecte uma instituição ou vincule um Item ID existente usando os campos acima.</p><a href="#connect-bank" class="mt-6 inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Conectar banco</a></div>
             @else
-                <div class="grid gap-5 md:grid-cols-2 mb-10"><div class="rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-200"><p class="text-sm text-slate-300">Saldo disponível</p><p class="mt-3 text-3xl font-light">R$ {{ number_format($totalBalance, 2, ',', '.') }}</p></div><div class="rounded-3xl border border-amber-100 bg-amber-50 p-6 shadow-sm"><p class="text-sm text-amber-800">Fatura em aberto</p><p class="mt-3 text-3xl font-light text-amber-950">R$ {{ number_format($creditBalance, 2, ',', '.') }}</p></div></div>
+                <div class="finup-connection-totals grid gap-5 md:grid-cols-2 mb-10"><div class="rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-200"><p class="text-sm text-slate-300">Saldo disponível</p><p class="mt-3 text-3xl font-light">R$ {{ number_format($totalBalance, 2, ',', '.') }}</p></div><div class="rounded-3xl border border-amber-100 bg-amber-50 p-6 shadow-sm"><p class="text-sm text-amber-800">Fatura em aberto</p><p class="mt-3 text-3xl font-light text-amber-950">R$ {{ number_format($creditBalance, 2, ',', '.') }}</p></div></div>
 
-                <div class="space-y-5 mb-10">
+                <div class="finup-connection-list space-y-5 mb-10">
                     @foreach ($connections as $connection)
                         <section data-sync-status="{{ $connection->last_sync_status }}" class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -55,7 +57,7 @@
                     @endforeach
                 </div>
 
-                <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <div class="finup-account-grid grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($accounts as $account)
                         @php($isCredit = $account->type === 'CREDIT')
                         <article class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="flex h-11 w-11 items-center justify-center rounded-2xl {{ $isCredit ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700' }}">{{ $isCredit ? '◫' : '⌁' }}</div><span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $isCredit ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700' }}">{{ $isCredit ? 'Cartão' : 'Conta' }}</span></div><h2 class="mt-5 truncate text-lg font-medium text-slate-900">{{ $account->name }}</h2><p class="mt-1 text-sm text-slate-500">Final {{ $account->number_last_four ?? '—' }}</p><div class="mt-6 border-t border-slate-100 pt-4"><p class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $isCredit ? 'Fatura atual' : 'Saldo disponível' }}</p><p class="mt-1 text-2xl font-light text-slate-900">R$ {{ number_format($account->balance, 2, ',', '.') }}</p></div></article>
@@ -97,10 +99,10 @@
                             <p class="font-medium">{{ $rule->phrase }} → {{ $rule->category?->name ?? 'Categoria indisponível' }}</p>
                             <p class="text-sm text-slate-500">Início: {{ $rule->starts_on?->format('d/m/Y') ?? 'todo o histórico' }} · Encerramento: {{ $rule->ends_before?->format('d/m/Y') ?? 'sem data' }} (dia não incluído)</p>
                             <details class="mt-2"><summary class="cursor-pointer text-sm text-blue-700">Editar regra</summary>
-                                <form method="POST" action="{{ route('pluggy.category-rules.update', $rule) }}" class="mt-2 flex flex-wrap gap-2">@csrf @method('PATCH')
-                                    <input name="phrase" value="{{ $rule->phrase }}" required minlength="3" maxlength="150" class="rounded-lg border-slate-200">
-                                    <select name="category_id" required class="rounded-lg border-slate-200">@foreach($categories as $category)<option value="{{ $category->id }}" @selected($rule->category_id === $category->id)>{{ $category->name }} ({{ $category->type === 'income' ? 'receita' : 'despesa' }})</option>@endforeach</select>
-                                    <input type="date" name="starts_on" value="{{ $rule->starts_on?->format('Y-m-d') }}" class="rounded-lg border-slate-200"><button class="rounded-lg bg-blue-600 px-3 py-2 text-white">Salvar</button>
+                                <form method="POST" action="{{ route('pluggy.category-rules.update', $rule) }}" class="mt-2 flex flex-wrap items-end gap-2">@csrf @method('PATCH')
+                                    <label>Descrição contém<input name="phrase" value="{{ $rule->phrase }}" required minlength="3" maxlength="150" class="rounded-lg border-slate-200"></label>
+                                    <label>Categoria<select name="category_id" required class="rounded-lg border-slate-200">@foreach($categories as $category)<option value="{{ $category->id }}" @selected($rule->category_id === $category->id)>{{ $category->name }} ({{ $category->type === 'income' ? 'receita' : 'despesa' }})</option>@endforeach</select></label>
+                                    <label>Válida a partir de (opcional)<input type="date" name="starts_on" value="{{ $rule->starts_on?->format('Y-m-d') }}" class="rounded-lg border-slate-200"></label><button class="rounded-lg bg-blue-600 px-3 py-2 text-white">Salvar</button>
                                 </form>
                             </details>
                             <form method="POST" action="{{ route('pluggy.category-rules.destroy', $rule) }}" class="mt-3 flex flex-wrap items-end gap-2" onsubmit="return confirm('Reavaliar as categorias afetadas por esta alteração?')">@csrf @method('DELETE')
@@ -118,14 +120,14 @@
                     <p class="mt-1 text-sm text-slate-500">Use frases específicas. A regra vale para lançamentos já importados e para as próximas sincronizações.</p>
                 </div>
 
-                <form method="POST" action="{{ route('pluggy.transaction-rules.store') }}" class="mt-5 grid gap-3 md:grid-cols-[1fr_230px_auto]">
+                <form method="POST" action="{{ route('pluggy.transaction-rules.store') }}" class="finup-transaction-rule-form mt-5">
                     @csrf
-                    <input name="phrase" required minlength="3" maxlength="150" value="{{ old('phrase') }}" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex.: Dinheiro reservado Guardar Dinheiro">
-                    <select name="pluggy_connection_id" required class="rounded-xl border-slate-200 text-sm"><option value="">Escolha uma conexão</option>@foreach ($connections as $connection)<option value="{{ $connection->id }}">{{ $connection->display_label }}</option>@endforeach</select>
-                    <select name="action" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <label>Descrição contém<input name="phrase" required minlength="3" maxlength="150" value="{{ old('phrase') }}" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex.: Dinheiro reservado Guardar Dinheiro"></label>
+                    <label>Conexão<select name="pluggy_connection_id" required class="rounded-xl border-slate-200 text-sm"><option value="">Escolha uma conexão</option>@foreach ($connections as $connection)<option value="{{ $connection->id }}">{{ $connection->display_label }}</option>@endforeach</select></label>
+                    <label>Tratamento<select name="action" class="rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="{{ \App\Models\PluggyTransactionRule::ACTION_EXCLUDE }}">Não contabilizar nos totais</option>
                         <option value="{{ \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER }}">Transferência entre minhas contas</option>
-                    </select>
+                    </select></label>
                     <button class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Adicionar</button>
                 </form>
 
@@ -134,28 +136,30 @@
                 @if ($transactionRules->isNotEmpty())
                     <div class="mt-6 divide-y divide-slate-100 rounded-2xl border border-slate-100">
                         @foreach ($transactionRules as $rule)
-                            <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col gap-5 p-4 xl:flex-row xl:items-start xl:justify-between">
                                 <div>
                                     <p class="font-medium text-slate-800">“{{ $rule->phrase }}”</p>
                                     <p class="text-sm text-slate-500">{{ $rule->connection?->display_label ?? 'Todas as conexões (regra anterior)' }} @if($rule->ends_before) · Válida até {{ $rule->ends_before->copy()->subDay()->format('d/m/Y') }} @endif</p>
                                     <p class="mt-1 text-sm text-slate-500">{{ $rule->action === \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER ? 'Transferência própria: não entra como receita nem despesa.' : 'Excluída dos totais financeiros.' }}</p>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    @if (! $rule->ends_before)<details class="relative">
-                                        <summary class="cursor-pointer list-none rounded-xl border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50">Editar</summary>
-                                        <form method="POST" action="{{ route('pluggy.transaction-rules.update', $rule) }}" class="absolute right-0 z-10 mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+                                <div class="grid w-full gap-4 xl:max-w-xl">
+                                    @if (! $rule->ends_before)<details class="min-w-0">
+                                        <summary class="finup-rule-edit-trigger inline-flex cursor-pointer list-none rounded-xl border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700">Editar</summary>
+                                        <form method="POST" action="{{ route('pluggy.transaction-rules.update', $rule) }}" class="mt-4 grid gap-5 rounded-2xl border border-slate-200 bg-white p-4">
                                             @csrf @method('PATCH')
-                                            <label class="block text-xs font-medium text-slate-600">Frase</label>
-                                            <input name="phrase" required minlength="3" maxlength="150" value="{{ $rule->phrase }}" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                                            <label class="mt-3 block text-xs font-medium text-slate-600">Ação</label>
-                                            <select name="action" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                                            <label class="block text-xs font-medium text-slate-600">Frase
+                                                <input name="phrase" required minlength="3" maxlength="150" value="{{ $rule->phrase }}" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                                            </label>
+                                            <label class="block text-xs font-medium text-slate-600">Ação
+                                                <select name="action" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
                                                 <option value="{{ \App\Models\PluggyTransactionRule::ACTION_EXCLUDE }}" @selected($rule->action === \App\Models\PluggyTransactionRule::ACTION_EXCLUDE)>Não contabilizar nos totais</option>
                                                 <option value="{{ \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER }}" @selected($rule->action === \App\Models\PluggyTransactionRule::ACTION_INTERNAL_TRANSFER)>Transferência entre minhas contas</option>
-                                            </select>
-                                            <button class="mt-3 w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Salvar regra</button>
+                                                </select>
+                                            </label>
+                                            <button class="w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Salvar regra</button>
                                         </form>
                                     </details>
-                                    <form method="POST" action="{{ route('pluggy.transaction-rules.destroy', $rule) }}" onsubmit="return confirm('Encerrar esta regra a partir da data escolhida e recalcular as movimentações?')">
+                                    <form method="POST" action="{{ route('pluggy.transaction-rules.destroy', $rule) }}" class="flex flex-wrap items-end gap-3" onsubmit="return confirm('Encerrar esta regra a partir da data escolhida e recalcular as movimentações?')">
                                         @csrf @method('DELETE')
                                         <label class="text-xs text-slate-600">Encerrar a partir de <input type="date" name="ends_before" required class="rounded-lg border-slate-200 text-sm"></label>
                                         <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Encerrar regra</button>

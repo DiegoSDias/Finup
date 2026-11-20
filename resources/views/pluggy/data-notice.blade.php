@@ -1,29 +1,24 @@
 <x-app-layout>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 px-4 py-8 sm:px-6 sm:py-12">
-        <div class="mx-auto max-w-4xl">
-            <header class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 4h.01M5.1 19h13.8c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.37 16c-.77 1.33.19 3 1.73 3z" />
-                        </svg>
-                    </div>
-                    <p class="text-sm font-semibold uppercase tracking-widest text-blue-600">Transparência dos dados</p>
-                    <h1 class="mt-2 text-3xl font-light tracking-tight text-slate-900 sm:text-4xl">Sobre as movimentações importadas</h1>
-                    <p class="mt-3 max-w-2xl text-base leading-7 text-slate-600">Entenda como funcionam os dados recebidos pela Pluggy e por que a sua conferência faz diferença.</p>
-                </div>
-                <a href="{{ route('pluggy.connections') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50">Ver conexões</a>
-            </header>
-
-            <section class="overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-200 sm:p-8">
+    <div class="finup-page finup-transparency"><div class="finup-page-inner">
+        <header class="finup-page-heading flex flex-wrap items-start justify-between gap-5">
+            <div><h1>Termo de <span>Transparência</span></h1><p class="finup-page-intro">Revise as condições de uso do FINUP.</p></div>
+            <a href="{{ route('pluggy.connections') }}" class="finup-button finup-button--secondary">Ver conexões</a>
+        </header>
+        <div class="finup-transparency-layout" x-data="{ tab: 0 }">
+            <nav class="finup-panel finup-transparency-tabs" role="tablist" aria-label="Transparência dos dados" @keydown.arrow-right.prevent="tab = (tab + 1) % 3; $nextTick(() => $el.querySelectorAll('button')[tab].focus())" @keydown.arrow-left.prevent="tab = (tab + 2) % 3; $nextTick(() => $el.querySelectorAll('button')[tab].focus())">
+                <button id="transparency-tab-0" type="button" role="tab" :aria-selected="tab === 0" :tabindex="tab === 0 ? 0 : -1" aria-controls="transparency-panel-0" @click="tab = 0"><x-finup-icon name="card" />1. Movimentações</button>
+                <button id="transparency-tab-1" type="button" role="tab" :aria-selected="tab === 1" :tabindex="tab === 1 ? 0 : -1" aria-controls="transparency-panel-1" @click="tab = 1"><x-finup-icon name="alert" />2. Atenção</button>
+                <button id="transparency-tab-2" type="button" role="tab" :aria-selected="tab === 2" :tabindex="tab === 2 ? 0 : -1" aria-controls="transparency-panel-2" @click="tab = 2"><x-finup-icon name="data" />3. Dados</button>
+            </nav>
+            <div class="finup-panel finup-transparency-content">
+                <div id="transparency-panel-0" role="tabpanel" aria-labelledby="transparency-tab-0" tabindex="0" x-show="tab === 0">
+<h2>Movimentações Importadas</h2><p class="mt-4">Entenda como funcionam os dados recebidos pela Pluggy e por que a sua conferência faz diferença.</p><section class="finup-notice">
                 <div class="max-w-3xl">
                     <p class="text-sm font-medium text-blue-200">Leia antes de usar a importação</p>
                     <h2 class="mt-2 text-2xl font-light sm:text-3xl">Os dados importados facilitam o controle, mas não substituem a conferência do seu extrato.</h2>
                     <p class="mt-4 leading-7 text-slate-300">As informações são fornecidas pela sua instituição financeira por meio da Pluggy. Embora trabalhemos para organizar cada lançamento da melhor forma, descrições, categorias, valores e tipos de movimentação podem chegar incompletos, atrasados ou interpretados de maneira diferente da situação real.</p>
                 </div>
-            </section>
-
-            <section class="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+            </section><section>
                 <div class="flex gap-4">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -34,8 +29,9 @@
                     </div>
                 </div>
             </section>
-
-            <section class="mt-8">
+                </div>
+                <div id="transparency-panel-1" role="tabpanel" aria-labelledby="transparency-tab-1" tabindex="0" x-show="tab === 1" x-cloak>
+<section class="mt-8">
                 <h2 class="text-xl font-semibold text-slate-900">Situações que podem exigir atenção</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <article class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
@@ -60,8 +56,9 @@
                     </article>
                 </div>
             </section>
-
-            <section class="mt-8 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
+                </div>
+                <div id="transparency-panel-2" role="tabpanel" aria-labelledby="transparency-tab-2" tabindex="0" x-show="tab === 2" x-cloak>
+<section class="mt-8 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
                 <h2 class="text-xl font-semibold text-slate-900">Como manter seus dados mais fiéis à realidade</h2>
                 <ol class="mt-5 space-y-4 text-slate-700">
                     <li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">1</span><span class="pt-0.5">Compare os lançamentos importados com o extrato da instituição financeira.</span></li>
@@ -70,6 +67,8 @@
                 </ol>
                 <div class="mt-6 rounded-2xl bg-blue-50 p-4 text-sm leading-6 text-blue-900">Ao manter uma conexão ativa, você reconhece que os dados importados são informativos e se compromete a conferir movimentações relevantes antes de usá-las como base para decisões financeiras.</div>
             </section>
+                </div>
+            </div>
         </div>
-    </div>
+    </div></div>
 </x-app-layout>
