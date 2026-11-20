@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         @if (session('success'))<div role="status" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">{{ session('success') }}</div>@endif
 
-        <x-back-button />
+        <x-finup-back :href="route('finances.index', ['year' => $year])" />
         
         {{-- Header --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in">

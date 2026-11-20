@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Services\HomeService;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index(Request $request, HomeService $homeService)
+    public function index()
     {
-        $anoSelecionado = $request->year ?? date('Y');
+        return view('dashboard');
+    }
+
+    public function finances(Request $request, HomeService $homeService)
+    {
+        $anoSelecionado = $request->integer('year', (int) date('Y'));
         $data = $homeService->index($anoSelecionado);
- 
-        return view('dashboard', compact('data', 'anoSelecionado'));
+
+        return view('finances.index', compact('data', 'anoSelecionado'));
     }
 }

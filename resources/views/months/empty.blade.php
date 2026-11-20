@@ -1,8 +1,8 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-8">
+<div class="finup-month-empty min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-8">
     
     <div class="max-w-6xl w-full">
 
-        <x-back-button />
+        <a href="{{ route('finances.index', ['year' => $year]) }}" class="finup-back"><span aria-hidden="true">←</span> Voltar às finanças</a>
 
         
         

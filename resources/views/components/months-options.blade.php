@@ -3,7 +3,7 @@
     $current = \Carbon\Carbon::create($year, $month, 1);
     $prev = $current->copy()->subMonth();
     $next = $current->copy()->addMonth();
-    
+
     $meses = [
         1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril',
         5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
@@ -11,13 +11,13 @@
     ];
 @endphp
 
-<div class="flex items-center gap-6">
+<div class="finup-month-navigation">
     {{-- Informações do Mês --}}
     <div>
         <h1 class="text-3xl font-light text-slate-900 mb-1">
-            {{ $month }} / {{ $year }}
+            {{ $meses[(int) $month] }} <span>{{ $year }}</span>
         </h1>
-        <p class="text-slate-500 text-sm font-light">Resumo mensal de gastos</p>
+        <p class="text-slate-500 text-sm font-light">Veja o seu resumo financeiro mensal.</p>
     </div>
 
     {{-- Navegação --}}

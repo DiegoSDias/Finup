@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group( function() {
     Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/financas', [HomeController::class, 'finances'])->name('finances.index');
     Route::get('months/{year}/{month}', [MonthsController::class, 'show'])->name('month.show');
     Route::post('months/{year}/{month}', [MonthsController::class, 'close'])->name('month.close');
     Route::get('expenses/{expense}/confirm-delete', [ExpensesController::class, 'confirmDelete'])->name('expenses.confirm-delete');
