@@ -1,6 +1,7 @@
 <x-app-layout>
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
         <div class="mx-auto max-w-4xl px-4">
+            <a href="{{ route('finances.index') }}" class="finup-back mb-6"><span aria-hidden="true">←</span> Voltar às finanças</a>
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <p class="text-sm font-medium uppercase tracking-widest text-rose-600">Planejamento</p>

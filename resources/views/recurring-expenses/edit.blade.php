@@ -64,7 +64,7 @@
                             @endforeach
                             <option value="new" @selected(old('bank_choice') === 'new')>Cadastrar outro banco</option>
                         </select>
-                        <input name="new_bank" maxlength="100" value="{{ old('new_bank') }}" placeholder="Nome do novo banco, se selecionado" class="mt-2 w-full rounded-xl border-slate-200">
+                        <div class="finup-new-bank"><label for="recurrence-new-bank">Nome do novo banco</label><input id="recurrence-new-bank" name="new_bank" maxlength="100" value="{{ old('new_bank') }}" placeholder="Nome do novo banco, se selecionado" class="mt-2 w-full rounded-xl border-slate-200"></div>
                         @error('bank_choice')<p class="text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div class="md:col-span-2 flex justify-end gap-3 border-t pt-6">
