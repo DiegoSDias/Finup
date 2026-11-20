@@ -1,108 +1,24 @@
 <x-app-layout>
-
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
-        <div class="max-w-3xl mx-auto px-4">
-            
-            {{-- Header --}}
-            <div class="mb-6 animate-fade-in">
-                <a href="{{ url()->previous() }}" 
-                   class="group inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-4">
-                    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    <span class="text-sm font-medium">Voltar</span>
-                </a>
-
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl {{ $type == 'income' ? 'bg-gradient-to-br from-emerald-500 to-green-500' : 'bg-gradient-to-br from-rose-500 to-red-500' }} flex items-center justify-center shadow-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            @if ($type == 'income')
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
-                            @else
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"/>
-                            @endif
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-light text-slate-900">
-                            @if ($type == 'income')
-                                Nova Receita
-                            @else
-                                Nova Despesa
-                            @endif
-                        </h1>
-                        <p class="text-slate-500 text-sm">Preencha os campos abaixo</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Formulário --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 animate-slide-up">
+    <div class="finup-page finup-page--form">
+        <div class="finup-page-inner">
+            <header class="finup-page-heading finup-movement-heading">
+                <x-finup-back :href="url()->previous()" />
+                <h1>Nova <span>{{ $type === 'income' ? 'receita' : 'despesa' }}</span></h1>
+                <p class="finup-page-intro">Preencha os campos abaixo.</p>
+            </header>
+            <div class="finup-panel finup-form-panel finup-form">
                 <form action="{{ route('expenses.store') }}" method="POST">
                     @csrf
-
                     @include('expenses._form')
-
-                    {{-- Botões --}}
-                    <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-slate-200">
-                        <a href="{{ url()->previous() }}" 
-                           class="px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm hover:shadow-md">
-                            Cancelar
-                        </a>
-
-                        <button type="submit" 
-                                class="group px-6 py-3 rounded-xl {{ $type == 'income' ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600' : 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600' }} text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2">
-                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Salvar {{ $type == 'income' ? 'Receita' : 'Despesa' }}
-                        </button>
+                    <div class="finup-form-actions">
+                        <a href="{{ url()->previous() }}" class="finup-button finup-button--secondary">Cancelar</a>
+                        <button type="submit" @class(['finup-button', 'finup-button--danger' => $type === 'expense'])>Salvar {{ $type === 'income' ? 'receita' : 'despesa' }}</button>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        @keyframes fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slide-up {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fade-in 0.6s ease-out;
-        }
-
-        .animate-slide-up {
-            animation: slide-up 0.8s ease-out;
-        }
-    </style>
-
-    <script>
+<script>
         const categorySelect = document.getElementById('categorySelect')
         const newCategoryField = document.getElementById('newCategoryField')
         const installmentRadios = document.querySelectorAll('input[name="is_installment"]')

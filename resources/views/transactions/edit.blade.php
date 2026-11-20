@@ -1,14 +1,14 @@
 <x-app-layout>
     @php($isIncome = $type === 'income')
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
+    <div class="finup-screen min-h-screen py-12" style="background-image: url('{{ asset('images/finup/background.png') }}')">
         <div class="max-w-3xl mx-auto px-4">
-            <a href="{{ $source === 'pluggy' ? route('pluggy.transactions.show', $transaction) : route('expenses.show', $transaction) }}" class="group inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors mb-4">← Voltar aos detalhes</a>
+            <a href="{{ $source === 'pluggy' ? route('pluggy.transactions.show', $transaction) : route('expenses.show', $transaction) }}" class="group inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors mb-4">← Voltar aos detalhes</a>
             <div class="mb-6 flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl {{ $isIncome ? 'bg-gradient-to-br from-emerald-500 to-green-500' : 'bg-gradient-to-br from-rose-500 to-red-500' }} flex items-center justify-center shadow-lg"></div>
-                <div><p class="text-sm font-medium uppercase tracking-widest {{ $source === 'pluggy' ? 'text-blue-600' : 'text-slate-600' }}">{{ $source === 'pluggy' ? 'Importado pela Pluggy' : 'Lançamento manual' }}</p><h1 class="text-3xl font-light text-slate-900">Editar {{ $isIncome ? 'receita' : 'despesa' }}</h1></div>
+                <div><p class="text-sm font-medium uppercase tracking-widest {{ $source === 'pluggy' ? 'text-blue-600' : 'text-gray-300' }}">{{ $source === 'pluggy' ? 'Importado pela Pluggy' : 'Lançamento manual' }}</p><h1 class="text-3xl font-semibold text-white">Editar {{ $isIncome ? 'receita' : 'despesa' }}</h1></div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 animate-slide-up">
+            <div class="finup-form rounded-xl border border-neutral-600 bg-neutral-900 p-6 sm:p-8 animate-slide-up">
                 @if ($source === 'manual')
                     <form action="{{ route('expenses.update', $transaction) }}" method="POST">
                         @csrf @method('PUT')

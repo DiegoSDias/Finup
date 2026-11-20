@@ -1,37 +1,25 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+<div class="finup-page finup-month-details">
+    <div class="finup-page-inner space-y-6">
         @if (session('success'))<div role="status" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">{{ session('success') }}</div>@endif
 
         <x-finup-back :href="route('finances.index', ['year' => $year])" />
-        
+
         {{-- Header --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in">
+        <div class="finup-month-heading bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <x-months-options :year="$year" :month="$month"/>
 
                 <div class="flex gap-3">
-                    <a href="{{ route('expenses.create', ['type' => 'income', 'year' => $year, 'month' => $month]) }}"
-                       class="group px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2">
-                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        Receita
-                    </a>
 
-                    <a href="{{ route('expenses.create', ['type' => 'expense', 'year' => $year, 'month' => $month]) }}"
-                       class="group px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 text-white font-medium hover:from-rose-700 hover:to-rose-600 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2">
-                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        Despesa
-                    </a>
+
+
                     <a href="{{ route('recurring-expenses.index') }}" class="group px-5 py-2.5 rounded-xl border border-rose-200 bg-white text-rose-700 font-medium hover:bg-rose-50 transition-all flex items-center gap-2">↻ Recorrências</a>
                 </div>
             </div>
         </div>
 
         {{-- RECEITAS --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.1s">
+        <div class="finup-movements bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.1s">
             <div class="bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-50 p-6 border-b border-emerald-100">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
@@ -40,9 +28,10 @@
                         </svg>
                     </div>
                     <h2 class="text-2xl font-light text-emerald-900">Receitas</h2>
+                    <a href="{{ route('expenses.create', ['type' => 'income', 'year' => $year, 'month' => $month]) }}" class="finup-add-movement"><x-finup-icon /> Adicionar Receita</a>
                 </div>
             </div>
-            
+
             <x-filter-incomes :categoriesIncome="$categoriesIncome"/>
 
             @if ($typeIncomes->isEmpty() && !$balanceMonthPrevious)
@@ -119,7 +108,7 @@
                                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                             </a>
-                                            <a href="{{ route('expenses.edit', $income) }}" 
+                                            <a href="{{ route('expenses.edit', $income) }}"
                                                class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors" title="Editar">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -145,7 +134,7 @@
                                 </tr>
                             @endforeach
                             <tr class="bg-emerald-50 border-t-2 border-emerald-200">
-                                <td class="px-6 py-4 font-bold text-slate-800 text-sm uppercase tracking-wide" colspan="3">Total de Receitas</td>
+                                <td class="px-6 py-4 font-bold text-slate-800 text-sm uppercase tracking-wide" colspan="2">Total de Receitas</td>
                                 <td class="px-6 py-4 text-right text-emerald-700 font-bold text-xl">
                                     R$ {{ number_format($filteredIncomesTotal, 2, ',', '.') }}
                                 </td>
@@ -158,7 +147,7 @@
         </div>
 
         {{-- DESPESAS --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.2s">
+        <div class="finup-movements finup-movements--expense bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.2s">
             <div class="bg-gradient-to-r from-rose-50 via-red-50 to-rose-50 p-6 border-b border-rose-100">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
@@ -167,6 +156,7 @@
                         </svg>
                     </div>
                     <h2 class="text-2xl font-light text-rose-900">Despesas</h2>
+                    <a href="{{ route('expenses.create', ['type' => 'expense', 'year' => $year, 'month' => $month]) }}" class="finup-add-movement"><x-finup-icon /> Adicionar Despesa</a>
                 </div>
             </div>
 
@@ -253,7 +243,7 @@
                                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                             </a>
-                                            <a href="{{ route('expenses.edit', $expense) }}" 
+                                            <a href="{{ route('expenses.edit', $expense) }}"
                                                class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors" title="Editar">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -279,12 +269,11 @@
                                 </tr>
                             @endforeach
                             <tr class="bg-rose-50 border-t-2 border-rose-200">
-                                <td class="px-6 py-4 font-bold text-slate-800 text-sm uppercase tracking-wide" colspan="4">Total de Despesas</td>
+                                <td class="px-6 py-4 font-bold text-slate-800 text-sm uppercase tracking-wide" colspan="3">Total de Despesas</td>
                                 <td class="px-6 py-4 text-right text-rose-700 font-bold text-xl">
                                     R$ {{ number_format($filteredExpensesTotal, 2, ',', '.') }}
                                 </td>
-                                <td></td>
-                                <td></td>
+                                <td colspan="2"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -320,7 +309,7 @@
         @endif
 
         {{-- RESUMO --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.3s">
+        <div class="finup-month-summary bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-slide-up" style="animation-delay: 0.3s">
             <div class="bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 p-6 border-b border-indigo-100">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
@@ -398,7 +387,7 @@
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
+
     * {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
