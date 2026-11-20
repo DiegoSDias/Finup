@@ -6,12 +6,12 @@
             Nome da Categoria
             <span class="text-red-500">*</span>
         </label>
-        <input 
-            type="text" 
-            name="name" 
+        <input
+            type="text"
+            name="name"
             id="name"
             value="{{ old('name', $category->name ?? '') }}"
-            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm hover:border-slate-300" 
+            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm hover:border-slate-300"
             placeholder="Ex: Alimentação, Salário, Transporte..."
             required
         />
@@ -91,8 +91,8 @@
         <label for="group_id" class="block text-sm font-semibold text-slate-700 mb-2">
             Grupo (opcional)
         </label>
-        <select 
-            name="group_id" 
+        <select
+            name="group_id"
             id="group_id"
             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm hover:border-slate-300 appearance-none cursor-pointer"
             style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23475569%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.25em;"
@@ -118,7 +118,7 @@
     </div>
 
     {{-- Dica sobre grupos --}}
-    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+    <div class="finup-form-tip bg-purple-50 border border-purple-200 rounded-xl p-4">
         <div class="flex gap-3">
             <svg class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
