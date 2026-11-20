@@ -213,6 +213,7 @@
                                         @endif
                                         @if($expense instanceof \App\Models\PluggyTransaction)
                                             <span class="block text-xs text-slate-500 mt-1">{{ $expense->connection?->display_label ?? 'Instituição não informada' }}</span>
+                                            @if(in_array($expense->id, $installmentReviewIds ?? [], true))<a href="{{ route('pluggy.transactions.show', $expense) }}" class="block mt-1 text-xs font-medium text-amber-700 underline">Possível parcela duplicada — revisar</a>@endif
                                         @else
                                             <span class="block text-xs text-slate-500 mt-1">{{ $expense->bank_label }}</span>
                                         @endif

@@ -38,7 +38,7 @@ class ExpenseService
     }
 
     public function show(string $id) {
-        $data = Expense::with(['category' => fn ($query) => $query->where('user_id', Auth::id())])
+        $data = Expense::with(['category' => fn ($query) => $query->where('user_id', Auth::id()), 'pluggyInstallmentSource' => fn ($query) => $query->where('user_id', Auth::id())->whereNull('removed_at')->whereNull('deleted_by_user_at')])
             ->where('user_id', Auth::id())->findOrFail($id);
         return $data;
     }
@@ -164,6 +164,14 @@ class ExpenseService
 
         $date = Carbon::parse($data['date']);
 
+        if ($expense->pluggy_installment_source_id && array_key_exists('current_installment', $data)) {
+            \App\Models\PluggyTransaction::where('user_id', Auth::id())->whereKey($expense->pluggy_installment_source_id)->lockForUpdate()->firstOrFail();
+            if (Expense::where('user_id', Auth::id())->where('pluggy_installment_source_id', $expense->pluggy_installment_source_id)
+                ->where('current_installment', $data['current_installment'])->whereKeyNot($expense->id)->exists()) {
+                throw ValidationException::withMessages(['current_installment' => 'Já existe uma parcela manual com este número vinculada a esta transação.']);
+            }
+        }
+
         $expense->update([
                 'category_id' => $data['category_id'],
                 'payment_mode' => $data['payment_mode'] ?? null,
@@ -174,6 +182,7 @@ class ExpenseService
                 'month' => $date->month,
                 'description' => $data['description'] ?? null,
                 'amount' => $data['amount'],
+                'current_installment' => $expense->pluggy_installment_source_id ? ($data['current_installment'] ?? $expense->current_installment) : $expense->current_installment,
             ]);
 
     }

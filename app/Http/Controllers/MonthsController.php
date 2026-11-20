@@ -123,6 +123,8 @@ class MonthsController extends Controller
 
         $typeIncomes = $manualIncomes->concat($importedIncomes)->sortBy('date')->values();
         $typeExpenses = $manualExpenses->concat($importedExpenses)->sortBy('date')->values();
+        $reviewService = app(\App\Services\Pluggy\InstallmentReviewService::class);
+        $installmentReviewIds = $reviewService->reviewIds($importedExpenses);
         
         $values = $this->monthlyBalanceService->calculate($year, $month);
 
@@ -149,6 +151,7 @@ class MonthsController extends Controller
                                             'month', 
                                             'typeIncomes', 
                                             'typeExpenses',
+                                            'installmentReviewIds',
                                             'excludedTransactions',
                                             'incomesBalance', 
                                             'expensesBalance',

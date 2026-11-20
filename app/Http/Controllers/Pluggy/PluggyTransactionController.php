@@ -8,6 +8,7 @@ use App\Models\PluggyTransaction;
 use App\Services\MonthlyBalanceService;
 use App\Services\Pluggy\PluggyTransactionClassifier;
 use App\Services\Pluggy\PluggyCategoryRuleService;
+use App\Services\Pluggy\InstallmentReviewService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,9 @@ class PluggyTransactionController extends Controller
             'source' => 'pluggy',
             'type' => $this->typeFor($transaction),
             'transaction' => $transaction,
+            'installmentCandidates' => app(InstallmentReviewService::class)->candidates($transaction),
+            'manualInstallmentCandidates' => app(InstallmentReviewService::class)->manualCandidates($transaction),
+            'expenseCategories' => Category::where('user_id', $request->user()->id)->where('type', 'expense')->orderBy('name')->get(),
         ]);
     }
 

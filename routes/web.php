@@ -14,6 +14,7 @@ use App\Http\Controllers\Pluggy\PluggyWebhookController;
 use App\Http\Controllers\Pluggy\PluggyTransactionRuleController;
 use App\Http\Controllers\Pluggy\PluggyCategoryRuleController;
 use App\Http\Controllers\Pluggy\PluggyTransactionController;
+use App\Http\Controllers\Pluggy\InstallmentReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -59,6 +60,7 @@ Route::middleware('auth')->group( function() {
     Route::delete('/pluggy/transaction-rules/{rule}', [PluggyTransactionRuleController::class, 'destroy'])->name('pluggy.transaction-rules.destroy');
     Route::post('/pluggy/transactions/{transaction}/restore-phrase', [PluggyTransactionRuleController::class, 'restore'])->name('pluggy.transactions.restore-phrase');
     Route::get('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'show'])->name('pluggy.transactions.show');
+    Route::post('/pluggy/transactions/{transaction}/manual-installment', [InstallmentReviewController::class, 'addManual'])->name('pluggy.transactions.manual-installment');
     Route::get('/pluggy/transactions/{transaction}/edit', [PluggyTransactionController::class, 'edit'])->name('pluggy.transactions.edit');
     Route::put('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'update'])->name('pluggy.transactions.update');
     Route::delete('/pluggy/transactions/{transaction}', [PluggyTransactionController::class, 'destroy'])->name('pluggy.transactions.destroy');

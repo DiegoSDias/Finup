@@ -29,6 +29,7 @@ class Expense extends Model
         'recurrence_occurrence_date',
         'recurrence_is_override',
         'recurrence_status',
+        'pluggy_installment_source_id',
     ];
 
     protected $casts = [
@@ -55,6 +56,11 @@ class Expense extends Model
     public function recurringExpense(): BelongsTo
     {
         return $this->belongsTo(RecurringExpense::class);
+    }
+
+    public function pluggyInstallmentSource(): BelongsTo
+    {
+        return $this->belongsTo(PluggyTransaction::class, 'pluggy_installment_source_id');
     }
 
     public function payableSettlement(): HasOne

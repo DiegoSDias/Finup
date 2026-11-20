@@ -181,7 +181,15 @@
             @error('payment_mode') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
         </div>
 
-        @if (! $isRecurring)
+        @if (! empty($expense->pluggy_installment_source_id))
+        <div>
+            <label for="currentInstallment" class="block text-sm font-semibold text-slate-700 mb-2">Número desta parcela</label>
+            <input id="currentInstallment" type="number" name="current_installment" min="1" max="{{ $expense->total_installments }}" required value="{{ old('current_installment', $expense->current_installment) }}" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl">
+            <p class="mt-1 text-xs text-slate-500">Parcela de um total de {{ $expense->total_installments }}. Essa alteração afeta apenas este lançamento.</p>
+            @error('current_installment') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+        @endif
+        @if (! $isRecurring && empty($expense->pluggy_installment_source_id))
         <div id="installmentControls" @class(['hidden' => isset($expense) && $expense->installments_group && old('installment_scope', 'single') === 'single'])>
         {{-- Compra parcelada --}}
         <div>

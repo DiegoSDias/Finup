@@ -54,7 +54,29 @@ class ExpensesRequest extends FormRequest
             }],
             'new_bank' => ['nullable', 'required_if:bank_choice,new', 'string', 'max:100'],
             'type' => 'required|in:income,expense',
-            'is_installment' => 'boolean',
+            'is_installment' => ['boolean', function ($attribute, $value, $fail) use ($expense) {
+                if ($expense?->pluggy_installment_source_id && filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                    $fail('Uma parcela manual vinculada não pode ser transformada em um novo parcelamento.');
+                }
+            }],
+            'current_installment' => [
+                'sometimes', 'required', 'integer', 'min:1',
+                function ($attribute, $value, $fail) use ($expense) {
+                    if (! $expense?->pluggy_installment_source_id) {
+                        $fail('O número da parcela só pode ser alterado em uma parcela manual vinculada.');
+                        return;
+                    }
+                    if ((int) $value > (int) $expense->total_installments) {
+                        $fail('O número da parcela não pode ser maior que o total de parcelas.');
+                        return;
+                    }
+                    if (Expense::where('user_id', $this->user()->id)
+                        ->where('pluggy_installment_source_id', $expense->pluggy_installment_source_id)
+                        ->where('current_installment', $value)->whereKeyNot($expense->id)->exists()) {
+                        $fail('Já existe uma parcela manual com este número vinculada a esta transação.');
+                    }
+                },
+            ],
             'total_installments' => [
                 \Illuminate\Validation\Rule::requiredIf(fn () => $this->boolean('is_installment') && ! (
                     $this->input('installment_scope') === 'single'
