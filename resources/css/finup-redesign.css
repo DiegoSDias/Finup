@@ -1,0 +1,412 @@
+/* Shared FINUP layout and component scale. */
+:root {
+    --finup-green: #27ae60;
+    --finup-mint: #93e2ad;
+    --finup-red: #ed7779;
+    --finup-border: #626262;
+    --finup-panel: #1e1e1e;
+    --finup-content-width: 88rem;
+    --finup-page-gutter: clamp(1.5rem, 5vw, 6rem);
+    --finup-page-title: clamp(1.75rem, 2.2vw, 2rem);
+    --finup-section-heading: 1.25rem;
+    --finup-panel-padding: clamp(1.25rem, 2vw, 2rem);
+}
+
+[x-cloak] { display: none !important; }
+html:has(> body.finup-app) { background-color: #1d1d1d; }
+.finup-app { min-height: 100vh; background-color: #1d1d1d; }
+/* Keep the final content margin inside the painted application shell. */
+.finup-app > .min-h-screen { display: flow-root; }
+.finup-app.font-sans, .finup-auth { font-family: Inter, system-ui, sans-serif; }
+.finup-app:not(:has(.finup-dashboard)) > .min-h-screen,
+.finup-auth {
+    background-color: #1d1d1d;
+    background-image: linear-gradient(#0006, #0006), var(--finup-background);
+    background-size: 100% 100%, 100% 223.14%;
+    background-position: center, center 50.3%;
+    background-repeat: no-repeat;
+    color: #f5f5f5;
+}
+.finup-app:not(:has(.finup-dashboard)) main.finup-theme,
+.finup-page.finup-screen { background: transparent !important; }
+.finup-app:not(:has(.finup-dashboard)) .finup-navigation { background: transparent; border: 0; }
+.finup-app .finup-navigation > div:first-child {
+    max-width: calc(var(--finup-content-width) + var(--finup-page-gutter) * 2); padding-inline: var(--finup-page-gutter);
+}
+.finup-app .finup-navigation > div:first-child > div { min-height: 5rem; }
+.finup-app .finup-navigation .gap-x-4 { gap: 1.25rem; flex-wrap: nowrap; }
+.finup-app .finup-navigation .gap-x-4 a {
+    font-size: .875rem; font-weight: 500; white-space: nowrap; padding-inline: 0;
+}
+.finup-app .finup-navigation a[aria-label="FINUP — início"] { gap: .5rem; }
+.finup-app .finup-navigation a[aria-label="FINUP — início"] > span:first-child {
+    width: 2.75rem; height: 2.75rem;
+}
+.finup-app .finup-navigation a[aria-label="FINUP — início"] > span:last-child {
+    width: 8rem; height: 1.75rem;
+}
+.finup-app .finup-navigation button > .w-8 {
+    width: 2.25rem; height: 2.25rem;
+    background: #bdf1cc; border-radius: 50%; color: var(--finup-green);
+}
+.finup-app .finup-navigation button > .w-8 span { color: #168947; font-size: 1rem; }
+.finup-app .finup-navigation > .lg\:hidden { background: #242424; border-color: #525252; }
+.finup-app .finup-navigation > .lg\:hidden :is(a, p, button, .font-medium) { color: #eee; }
+.finup-app .finup-navigation > .lg\:hidden a:hover { background: #383838; }
+.finup-app .finup-navigation > .lg\:hidden .bg-blue-100 { background: #214b34; color: var(--finup-mint); }
+
+.finup-app .finup-navigation .finup-account-menu {
+    padding: .375rem;
+    max-width: calc(100vw - 3rem);
+    border-color: #494949;
+    border-radius: .75rem;
+    background: var(--finup-panel);
+    color: #eee;
+    box-shadow: 0 16px 40px #0006;
+}
+.finup-account-menu .finup-account-summary { padding: .75rem .625rem; border-color: #3a3a3a; }
+.finup-app .finup-navigation .finup-account-menu .finup-account-label { color: #aaa; font-size: .6875rem; letter-spacing: .1em; }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-name { color: #eee; font-weight: 600; }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-email { color: #bcbcbc; }
+.finup-account-menu .finup-account-divider { margin: .375rem .5rem; border-color: #3a3a3a; }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: .625rem .75rem;
+    border-radius: .5rem;
+    color: #eee;
+    font-size: .875rem;
+    font-weight: 500;
+}
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-item:hover { background: #153f2c; color: var(--finup-mint); }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-item:focus-visible { outline-offset: -2px; }
+.finup-account-profile > svg { color: var(--finup-mint); }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-logout { color: #fca5a5; }
+.finup-app .finup-navigation :is(.finup-account-menu,.finup-account-mobile) .finup-account-logout:hover { background: #462d2d; color: #fecaca; }
+.finup-app .finup-navigation .finup-account-mobile { border-color: #3a3a3a; background: var(--finup-panel); }
+.finup-account-mobile .finup-account-avatar { border-radius: 50%; background: #bdf1cc; }
+.finup-account-mobile .finup-account-avatar > span { color: #168947; }
+
+.finup-page { min-height: calc(100vh - 5rem); padding: 2.5rem var(--finup-page-gutter) 4rem; }
+.finup-page > .finup-page-inner { width: 100%; max-width: var(--finup-content-width); padding: 0; margin-inline: auto; }
+.finup-theme > .min-h-screen:not(.finup-page) { min-height: calc(100vh - 5rem); padding: 2.5rem var(--finup-page-gutter) 4rem; background: transparent; }
+.finup-theme > .min-h-screen.finup-screen { background-image: none !important; }
+.finup-theme > .min-h-screen > .mx-auto { width: 100%; padding-inline: 0; }
+.finup-theme > .min-h-screen h1 { font-size: 1.75rem; }
+.finup-theme > .min-h-screen :is(.p-8, .p-6) { padding: var(--finup-panel-padding); }
+.finup-theme :is(a,button).py-3 { min-height: 2.75rem; padding-block: .625rem; font-size: .875rem; }
+.finup-page h1, .finup-section-title {
+    font-size: var(--finup-page-title); line-height: 1.2; font-weight: 600; letter-spacing: .015em;
+}
+.finup-page h1 span, .finup-section-title span { color: var(--finup-green); }
+.finup-page-intro { margin-top: .75rem; color: #e5e5e5; font-size: 1rem; line-height: 1.5; }
+.finup-page-heading { margin-bottom: 2rem; }
+.finup-page-heading .finup-back { margin-bottom: 1.25rem; }
+.finup-page.finup-page--form { padding-top: 1.5rem; }
+.finup-page--form .finup-page-heading { margin-bottom: 2rem; }
+.finup-back { display: inline-flex; align-items: center; gap: .75rem; color: #eee; font-size: 1rem; }
+.finup-back:hover { color: var(--finup-mint); }
+.finup-back svg { width: 1.5rem; height: 1.5rem; }
+.finup-button {
+    display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+    min-height: 2.75rem; padding: .65rem 1.25rem; border-radius: .625rem;
+    background: var(--finup-mint); color: #18231d; font-size: .875rem;
+    font-weight: 500; line-height: 1.3; transition: background-color .15s;
+}
+.finup-button:hover { background: #b4edc5; }
+.finup-button--secondary { background: #414141; color: #eee; }
+.finup-button--secondary:hover { background: #525252; }
+.finup-button--danger { background: #e6b3b3; color: #282020; }
+.finup-button--danger:hover { background: #f0c8c8; }
+.finup-app :is(a,button,input,select,summary):focus-visible,
+.finup-auth :is(a,button,input):focus-visible { outline: 2px solid var(--finup-mint); outline-offset: 4px; }
+.finup-panel { border: 1px solid var(--finup-border); border-radius: .8rem; background: var(--finup-panel); }
+.finup-form-panel { width: min(100%, 48rem); margin-inline: auto; padding: var(--finup-panel-padding); }
+.finup-form-panel .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: var(--finup-field-gap); }
+.finup-form-panel label:not(:has(input[type=radio])) {
+    color: #eee; font-size: .875rem; font-weight: 500;
+}
+.finup-form-panel :is(input:not([type=radio]):not([type=checkbox]):not([type=hidden]), select, textarea) {
+    width: 100%; min-width: 0; min-height: var(--finup-control-height);
+    border: 1px solid #565656; border-radius: var(--finup-control-radius); background-color: #383838;
+    color: #eee; padding: .5625rem var(--finup-control-padding); font-size: var(--finup-control-font); box-shadow: none; color-scheme: dark;
+}
+.finup-form-panel :is(input,textarea)::placeholder { color: #b0b0b0; opacity: 1; }
+.finup-form-panel :is(input,select,textarea):focus { border-color: var(--finup-mint); --tw-ring-color: #93e2ad66; }
+.finup-form-panel input[name=amount] { padding-left: 3rem !important; }
+.finup-form-panel label:has(input[type=radio]) {
+    min-height: var(--finup-control-height); padding: .625rem .875rem;
+    border: 1px solid #606060; border-radius: var(--finup-control-radius); background: #3d3d3d;
+}
+.finup-form-panel label:has(input[type=radio]):has(input:checked) { border-color: var(--finup-mint); background: #294536; }
+.finup-form-panel label:has(input[type=radio]) span { color: #eee; font-size: 1rem; }
+.finup-form-panel label:has(input[type=radio]):focus-within { outline: 2px solid var(--finup-mint); outline-offset: 3px; }
+.finup-form-panel .grid-cols-2 { gap: 1rem; }
+.finup-form-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-top: 2rem; }
+.finup-form-panel .finup-form-actions > :is(a,button) { min-height: var(--finup-control-height); padding: .625rem 1.25rem; font-size: .875rem; }
+.finup-form-panel .finup-form-tip { background: #2b2b2b; border-color: #525252; color: #bbb; }
+.finup-form-panel .finup-form-tip :is(p,a,div) { color: #bbb; }
+.finup-form-panel .finup-form-tip a { color: var(--finup-mint); }
+.finup-form-panel .space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: 2.5rem; }
+.finup-form-panel .space-y-4 .p-4 { background: transparent; border: 1px solid #525252; }
+.finup-form-panel button.bg-gradient-to-r { background-image: none; background-color: var(--finup-mint); color: #17271d; box-shadow: none; }
+.finup-form-panel button.from-rose-500 { background-color: #e6b3b3; }
+.finup-form-panel .space-y-4 > .flex { flex-wrap: wrap; gap: 1rem; }
+
+.finup-page .finup-category-columns { gap: 1.5rem; }
+.finup-page .finup-category-card { min-height: 0; border-color: #666; background: #1d1d1d; border-radius: .75rem; }
+.finup-category-card > div:first-child { padding: 1rem 1.25rem; }
+.finup-category-card h2 { font-size: 1.125rem; font-weight: 500; text-transform: uppercase; }
+.finup-category-card > .bg-green-700 { background-color: #218b4f; }
+.finup-category-card > .bg-red-700 { background-color: #963436; }
+.finup-category-card .p-4 { padding: 1rem; }
+.finup-category-card .p-4 > div { padding: .75rem; border: 1px solid #444; border-radius: .4rem; }
+.finup-category-card h3 { font-size: 1rem; text-transform: uppercase; }
+.finup-category-card .text-xs { font-size: .875rem; }
+
+.finup-group-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.25rem; max-width: var(--finup-content-width); margin-inline: auto; }
+.finup-group-card { padding: 1.25rem; background: #282828; border: 1px solid #555; border-radius: .625rem; }
+.finup-group-card h2 { color: #42b477; font-size: 1.25rem; }
+.finup-group-card ul { display: grid; gap: .5rem; margin-top: 1rem; }
+.finup-group-card li { display: flex; gap: .65rem; align-items: center; background: #3a3a3a; border: 1px solid #505050; padding: .5rem .75rem; border-radius: .2rem; }
+.finup-group-card li > span:first-child { width: .4rem; height: .4rem; flex-shrink: 0; border-radius: 50%; }
+.finup-group-card .finup-button { margin: 1.25rem auto 0; display: flex; width: fit-content; min-height: 2rem; padding: .4rem 1.5rem; font-size: .95rem; border-radius: 2rem; }
+.finup-group-detail { width: min(100%, 36rem); margin: 1rem auto; }
+.finup-icon-button { display: inline-flex; padding: .5rem; border-radius: .3rem; color: #aaa; }
+.finup-icon-button:hover { background: #414141; }
+.finup-icon-button svg { width: 1.1rem; height: 1.1rem; }
+
+.finup-profile .finup-profile-sections { width: min(100%,64rem); margin-inline: auto; display: grid; gap: 1.5rem; }
+.finup-profile-card { border: 1px solid #494949; background: #1e1e1e; border-radius: .25rem; overflow: hidden; }
+.finup-profile-card > header { display: flex; align-items: center; gap: .75rem; padding: 1rem 1.5rem; background: #2c2c2c; }
+.finup-profile-card > header svg { width: 1.75rem; height: 1.75rem; color: #b0b0b0; }
+.finup-profile-card h2 { font-size: var(--finup-section-heading); font-weight: 500; }
+.finup-profile-card > header p { color: #aaa; font-size: .875rem; margin-top: .25rem; }
+.finup-profile-content { padding: var(--finup-panel-padding); }
+.finup-profile-content .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+.finup-profile-content label { font-size: .875rem; font-weight: 500; }
+.finup-profile-content input:not([type=hidden]) { min-height: var(--finup-control-height); font-size: 1rem; background: #383838; border-radius: var(--finup-control-radius); }
+.finup-profile-content form > .flex.items-center.gap-4 { justify-content: flex-end; }
+.finup-profile-content button.bg-gradient-to-r { background: var(--finup-mint); color: #17271d; box-shadow: none; padding: .5rem 1.25rem; }
+.finup-profile-content button.from-red-600 { background: #a92e35; color: #fff; margin-left: auto; }
+.finup-profile-content .bg-red-50 { background: #2c2c2c; border-color: #555; }
+
+.finup-connections .finup-connection-totals > div { padding: 1.25rem; border-radius: .5rem; box-shadow: none; border: 1px solid #68776b; }
+.finup-connections .finup-connection-totals > div:first-child { background: #344a3c; }
+.finup-connections .finup-connection-totals > div:last-child { background: #462d2d; border-color: #765050; }
+.finup-connections .finup-connection-list > section { border-radius: .625rem; background: #1d1d1d; box-shadow: none; }
+.finup-connections .finup-account-grid > article { background: #1d1d1d; border: 1px solid #626262; border-radius: .625rem; box-shadow: none; }
+.finup-connections .finup-account-grid h2 { margin-top: 1rem; font-size: 1.125rem; }
+.finup-connections .finup-account-grid .text-2xl { font-size: 1.5rem; }
+.finup-connections .finup-connection-totals .text-3xl { font-size: 1.75rem; }
+.finup-connections :is(.finup-connection-list > section, .finup-account-grid > article, .finup-page-inner > section) { padding: 1.25rem; }
+.finup-connections .finup-account-grid .bg-blue-100 { background: #2e4937; color: var(--finup-mint); }
+.finup-connections .finup-account-grid .bg-amber-100 { background: #58462a; }
+.finup-connections > .finup-page-inner > section { background: #222; border-radius: .625rem; box-shadow: none; }
+.finup-connections :is(input,select) { max-width: 100%; color-scheme: dark; }
+.finup-connections label { min-width: 0; }
+.finup-connections form > input { min-width: 0; }
+.finup-connect-panel { scroll-margin-top: 6rem; }
+.finup-connect-panel :is(button,a):not(.hidden) { min-height: var(--finup-control-height); display: inline-flex; align-items: center; justify-content: center; }
+
+.finup-transparency-layout { display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 1.25rem; min-height: 30rem; }
+.finup-transparency-tabs { display: flex; flex-direction: column; align-items: stretch; gap: .5rem; padding: 1.25rem .75rem; }
+.finup-transparency-tabs button { display: flex; align-items: center; gap: .75rem; padding: .875rem .75rem; text-align: left; border-radius: .5rem; font-size: .9375rem; }
+.finup-transparency-tabs button[aria-selected=true] { background: #153f2c; }
+.finup-transparency-tabs button > svg { width: 1.75rem; height: 1.75rem; flex-shrink: 0; color: #4b9e6d; }
+.finup-transparency-tabs button::after { content: '›'; margin-left: auto; color: #4b9e6d; }
+.finup-transparency-content { padding: var(--finup-panel-padding); }
+.finup-transparency .finup-transparency-content h2 { font-size: var(--finup-section-heading); font-weight: 500; color: #a6dfb7; }
+.finup-transparency .finup-transparency-content :is(.text-amber-900,.text-amber-800,.text-amber-950) { color: #bcbcbc; }
+.finup-transparency .finup-transparency-content .bg-amber-100 { background: transparent; color: #a6dfb7; }
+.finup-transparency-content h3 { font-weight: 500; color: #eee; }
+.finup-transparency-content p { color: #bcbcbc; line-height: 1.65; }
+.finup-transparency-content section { margin: 0; padding: 0; border: 0; background: transparent; border-radius: 0; box-shadow: none; }
+.finup-transparency-content .finup-notice { padding: 1.5rem; background: #153f2c; border-radius: .4rem; margin-block: 2rem; }
+.finup-transparency-content .finup-notice h2 { font-size: 1.2rem; }
+.finup-transparency-content article { padding: 1rem 0; background: transparent; border: 0; box-shadow: none; }
+.finup-transparency-content article h3 { margin-top: 0; }
+.finup-transparency-content article > div { float: left; margin: .15rem 1rem 0 0; width: 1.75rem; height: 1.75rem; background: transparent; color: #4b9e6d; }
+.finup-transparency-content .grid { display: block; }
+.finup-transparency-content ol { margin-top: 2rem; }
+.finup-transparency-content ol li { padding-block: .4rem; }
+.finup-transparency-content ol li > span:first-child { background: #27ae60; color: #12301d; }
+
+.finup-month-details > .finup-page-inner > .finup-month-heading { background: transparent; border: 0; padding: 0 0 1.25rem; box-shadow: none; }
+.finup-month-details .finup-movements { background: #282828; border: 1px solid #626262; border-radius: .8rem; box-shadow: none; margin-block: 1.5rem; }
+.finup-month-details .finup-movements > div:first-child { background: transparent; border: 0; padding: 1.25rem 1.5rem; }
+.finup-month-details .finup-movements h2 { font-size: 1.5rem; font-weight: 500; }
+.finup-month-details .finup-movements > div:first-child > .flex { flex-wrap: wrap; }
+.finup-month-details .finup-movements > div:first-child .w-10 { background: transparent; }
+.finup-add-movement { display: inline-flex; align-items: center; gap: .5rem; margin-left: auto; color: #27ae60; font-size: 1rem; text-decoration: underline; }
+.finup-movements--expense .finup-add-movement { color: #ed7779; }
+.finup-month-details .finup-movements > form { background: transparent; padding: 1rem 1.5rem 1.5rem; }
+.finup-month-details .finup-movements > form label { text-transform: none; letter-spacing: 0; font-size: .875rem; font-weight: 500; }
+.finup-month-details .finup-movements > form :is(input,select) { min-height: var(--finup-control-height); font-size: var(--finup-control-font); color-scheme: dark; }
+.finup-month-details .finup-movements > form button { background: var(--finup-mint); color: #17271d; }
+.finup-month-details .finup-movements--expense > form button { background: #e6b3b3; }
+.finup-month-details table :is(thead,tfoot) { background: transparent; }
+.finup-month-details table th { font-size: .875rem; text-transform: none; letter-spacing: 0; color: #eee; font-weight: 500; }
+.finup-month-details table :is(td,th) { padding: .875rem 1.5rem; border-color: #555; }
+.finup-month-details table td { font-size: .9375rem; }
+.finup-month-details table :is(tfoot td, tr:has(> td[colspan]) td) { padding-block: 1rem; font-size: 1rem; }
+.finup-month-details .finup-month-summary { background: #282828; border: 1px solid #626262; border-radius: .8rem; padding: 1.25rem 1.5rem; box-shadow: none; }
+.finup-month-details .finup-month-summary > div:first-child { background: transparent; }
+.finup-month-details .finup-month-summary h2 { font-size: 1.5rem; font-weight: 500; }
+.finup-month-summary > .p-8 { padding: 1.25rem 0 0; }
+.finup-month-summary .py-4 { padding-block: .75rem; }
+.finup-month-summary .py-5 { padding-block: 1rem; }
+.finup-month-summary .text-3xl { font-size: 1.5rem; }
+.finup-month-summary :is(.text-2xl, .text-xl) { font-size: 1.125rem; }
+.finup-month-details .finup-month-summary .rounded-xl.border-2 { background: var(--finup-mint); border: 0; }
+.finup-month-details .finup-month-summary .rounded-xl.border-2 * { color: #102419; }
+.finup-month-details .finup-month-summary > div:last-child > form > button { background: transparent; color: #eee; border: 1px solid #27ae60; box-shadow: none; width: fit-content; margin-left: auto; }
+.finup-month-navigation { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+.finup-month-navigation h1 { font-size: var(--finup-page-title); }
+.finup-month-navigation h1 span { color: #27ae60; }
+
+.finup-month-empty > .max-w-6xl { max-width: 64rem; margin-inline: auto; }
+.finup-month-empty .my-12 { margin-block: 2rem; }
+.finup-month-empty .gap-8 { gap: 1.5rem; }
+.finup-month-empty .grid > a { padding: 1.5rem; border-radius: .75rem; }
+.finup-month-empty .w-24.h-24 { width: 3.5rem; height: 3.5rem; }
+.finup-month-empty .w-24.h-24 > svg { width: 2rem; height: 2rem; }
+.finup-month-empty .text-3xl { font-size: 1.5rem; }
+.finup-month-empty .text-lg { font-size: 1rem; }
+
+.finup-finances { width: calc(100% - var(--finup-page-gutter) * 2); max-width: var(--finup-content-width); margin-inline: auto; padding: 3rem 0; }
+.finup-finances-page { min-height: calc(100vh - 5rem); padding-top: 2rem; }
+.finup-finances-page > .finup-back { margin-bottom: 1.5rem; }
+.finup-finances-page .finup-year-switcher { margin-top: .5rem; }
+.finup-finances :is(h1,h2) { font-size: var(--finup-page-title); font-weight: 600; }
+.finup-finance-heading { display: grid; gap: 1.5rem; }
+.finup-finance-heading p { font-size: 1rem; }
+.finup-year-switcher { position: relative; justify-self: end; margin-top: 1.5rem; }
+.finup-year-switcher::before { content: 'ANO'; position: absolute; top: -1.5rem; left: 3rem; color: #27ae60; font-size: .875rem; }
+.finup-finances .finup-annual-cards { gap: 1.5rem; margin-top: 2rem; }
+.finup-finances .finup-annual-card { border: 1px solid #666; border-radius: .75rem; background: #1e1e1e; }
+.finup-finances .finup-annual-card h3 { padding: .875rem 1.25rem; font-size: 1rem; background: #218b4f; }
+.finup-annual-value { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 1.25rem; }
+.finup-annual-value > svg { width: 2.5rem; height: 2.5rem; color: #27ae60; flex-shrink: 0; }
+.finup-annual-value > div { text-align: right; }
+.finup-annual-value p:first-child { font-size: clamp(1.5rem,2vw,1.75rem); font-weight: 600; }
+.finup-finances .finup-months-title { font-size: 1.5rem; }
+.finup-finances > .mt-14 { margin-top: 3rem; }
+.finup-finances > .mt-14 > p { font-size: 1rem; }
+.finup-finances > .mt-14 > .overflow-x-auto { margin-top: 1.5rem; }
+.finup-finances .finup-month-summary-layout h4 { font-size: 1.25rem; }
+.finup-finances .finup-month-summary-layout p { font-size: 1rem; }
+.finup-finances .finup-month-timeline { display: flex; justify-content: space-between; border: 0; gap: 1rem; position: relative; padding-top: .75rem; }
+.finup-month-timeline::before { content: ''; position: absolute; left: 0; right: 0; top: 1.4rem; height: .2rem; background: #ccc; }
+.finup-month-timeline button { display: flex; flex-direction: column; align-items: center; gap: .75rem; position: relative; font-size: .875rem; }
+.finup-month-timeline button::before { content: ''; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #27ae60; }
+.finup-month-timeline button[aria-pressed=true] { color: var(--finup-green); }
+.finup-finance-chart { min-width: 0; color: #ddd; }
+.finup-finance-chart svg { width: 100%; height: auto; overflow: visible; }
+.finup-finance-chart figcaption { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: .875rem; padding: 1rem 2rem; }
+.finup-finance-chart figcaption span::before { content: ''; display: inline-block; width: 2rem; height: .2rem; background: #27ae60; vertical-align: middle; margin-right: .5rem; }
+.finup-finance-chart figcaption span:last-child::before { background: #93e2ad; }
+.finup-finance-chart .finup-chart-empty { margin-top: 1rem; color: #aaa; font-size: .875rem; }
+
+.finup-auth { min-height: 100svh; }
+.finup-auth-shell { min-height: 100svh; display: grid; grid-template-columns: 44.8% 55.2%; }
+.finup-auth-art { position: relative; overflow: hidden; min-height: 100svh; }
+.finup-auth-art > img { position: absolute; width: 155%; max-width: none; left: -18.5%; top: 9.5%; }
+.finup-auth-back { position: absolute; top: 1.5rem; left: 2rem; z-index: 2; color: #fff; }
+.finup-auth-main { background: #151515; border-radius: 2rem 0 0 2rem; padding: 3rem 10% 4rem; }
+.finup-auth-brand { display: flex; justify-content: center; align-items: center; gap: 0; margin: 0 auto 2.5rem; }
+.finup-auth-brand .finup-logo-mark { width: 4rem; height: 4rem; }
+.finup-auth:has(form[action$="/register"]) .finup-auth-brand { margin-bottom: 2.5rem; }
+.finup-auth-brand .finup-logo-word { width: 12rem; height: 2.6rem; }
+.finup-auth-content { max-width: 28rem; margin-inline: auto; }
+.finup-auth h1 { font-size: 1.5rem; font-weight: 500; margin-bottom: 2rem; }
+.finup-auth-form > div + div { margin-top: 1.25rem; }
+.finup-auth-form label { display: block; font-size: .875rem; margin-bottom: .5rem; }
+.finup-auth-form input:not([type=checkbox]) { width: 100%; padding: .5625rem var(--finup-control-padding); min-height: var(--finup-control-height); background: #53575a; border: 1px solid transparent; border-radius: var(--finup-control-radius); color: #fff; font-size: 1rem; box-shadow: none; }
+.finup-auth-form input::placeholder { color: #b6b9ba; }
+.finup-auth .finup-auth-options { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: .25rem; font-size: .95rem; }
+.finup-auth-options label { display: flex; gap: .5rem; align-items: center; margin: 0; font-size: .95rem; }
+.finup-auth-options input { accent-color: #27ae60; }
+.finup-auth a:not(.finup-auth-back) { color: #27ae60; }
+.finup-auth .finup-auth-submit { display: flex; justify-content: center; width: 100%; min-height: var(--finup-control-height); align-items: center; margin: 1.5rem auto 1rem; padding: .625rem 1rem; background: #27ae60; color: white; border-radius: .625rem; font-size: 1rem; }
+.finup-auth .finup-auth-submit:hover { background: #219c53; }
+.finup-auth .finup-auth-error { color: #fca5a5; margin-top: .5rem; font-size: .875rem; }
+.finup-auth-status { border: 1px solid #408957; background: #1e3729; padding: 1rem; border-radius: .5rem; margin-bottom: 1.5rem; }
+.finup-auth-switch { font-size: 1rem; }
+/* Recovery and verification forms share the guest shell. */
+.finup-auth-content :is(.text-gray-900,.text-gray-700,.text-gray-600,.text-slate-700) { color: #ddd; }
+.finup-auth-content form:not(.finup-auth-form) input:not([type=hidden]):not([type=checkbox]) {
+    min-height: 3rem; border-color: #606060; border-radius: .75rem; background: #383838; color: #fff;
+}
+.finup-auth-content form:not(.finup-auth-form) .bg-gray-800 { background: #27ae60; color: #fff; }
+
+@media (min-width:1440px) {
+    .finup-app .finup-navigation > div:first-child > div > div:first-child { gap: 2.5rem; }
+}
+@media (min-width:1024px) {
+    .finup-finances .finup-month-summary-layout { grid-template-columns: minmax(18rem,30%) minmax(0,1fr); gap: 2.5rem; }
+}
+@media (min-width:768px) {
+    .finup-finances-page .finup-finance-heading { grid-template-columns: minmax(0,1fr) auto; align-items: end; }
+    .finup-finances-page .finup-year-switcher { margin-top: 0; }
+}
+@media (min-width:1024px) and (max-width:1439px) {
+    .finup-app .finup-navigation .lg\:flex { display: none; }
+    .finup-app .finup-navigation > div:first-child > div > .lg\:hidden { display: flex; }
+    .finup-app .finup-navigation > .lg\:hidden:not(.hidden) { display: block; }
+}
+@media (max-width:1023px) {
+    .finup-auth-shell { display: block; }
+    .finup-auth-art { display: none; }
+    .finup-auth-main { min-height: 100svh; border-radius: 0; padding: 4rem var(--finup-page-gutter) 3rem; }
+    .finup-auth-brand { margin-bottom: 2rem; }
+    .finup-transparency-layout { grid-template-columns: 1fr; }
+    .finup-transparency-tabs { flex-direction: row; flex-wrap: wrap; padding: .75rem; gap: .5rem; }
+    .finup-transparency-tabs button { flex: 1; padding: .75rem; font-size: .875rem; }
+    .finup-transparency-tabs button > svg { width: 1.5rem; height: 1.5rem; }
+    .finup-group-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .finup-page { min-height: calc(100vh - 5rem); }
+}
+@media (max-width:639px) {
+    .finup-page { padding: 1.75rem var(--finup-page-gutter) 3rem; }
+    .finup-page-heading { margin-bottom: 2rem; }
+    .finup-page.finup-page--form { padding-top: 1.5rem; }
+    .finup-page-heading .flex.justify-between { flex-wrap: wrap; gap: 1rem; }
+    .finup-page-heading .finup-button { padding-inline: .875rem; }
+    .finup-group-grid { grid-template-columns: 1fr; }
+    .finup-category-card { min-height: 0; }
+    .finup-form-panel { padding: 1.25rem; }
+    .finup-form-panel .grid-cols-2 { gap: .75rem; }
+    .finup-form-panel label:has(input[type=radio]) { padding: .75rem; }
+    .finup-form-panel label:has(input[type=radio]) .gap-3 { gap: .5rem; }
+    .finup-form-panel :is(input:not([type=radio]):not([type=checkbox]):not([type=hidden]),select,textarea) { padding-inline: 1rem; }
+    .finup-form-panel .flex-1 { min-width: 0; }
+    .finup-form-panel .space-y-4 .flex.gap-4 { flex-wrap: wrap; gap: .5rem; }
+    .finup-profile-card > header { padding: 1rem; }
+    .finup-profile-content input:not([type=hidden]) { min-height: var(--finup-control-height); }
+    .finup-transparency-tabs button::after { display: none; }
+    .finup-transparency-tabs button { flex-basis: 100%; }
+    .finup-connections .finup-connection-totals > div { padding: 1.25rem; }
+    .finup-month-details .finup-movements > form { padding: 1rem; }
+    .finup-month-details .finup-month-heading > .flex > .flex { flex-wrap: wrap; }
+    .finup-month-details .finup-add-movement { margin-left: 0; }
+    .finup-month-details .finup-movements > form .flex.gap-3 { flex-wrap: wrap; }
+    .finup-month-details .finup-movements > form .flex.gap-3 > div { width: 100%; }
+    .finup-month-details table { min-width: 42rem; }
+    .finup-month-details .finup-month-summary { padding: 1rem; }
+    .finup-month-details .finup-month-summary .flex { flex-wrap: wrap; gap: .75rem; }
+    .finup-finances { padding-block: 2rem; }
+    .finup-finances .finup-annual-cards { margin-top: 2rem; }
+    .finup-finances > .mt-14 { margin-top: 3rem; }
+    .finup-finances .finup-annual-value { padding: 1.25rem; }
+    .finup-auth .finup-auth-options { flex-wrap: wrap; }
+    .finup-auth-brand .finup-logo-mark { width: 4rem; height: 4rem; }
+    .finup-auth-brand .finup-logo-word { width: 12rem; height: 2.6rem; }
+    .finup-auth:has(form[action$="/register"]) .finup-auth-brand { margin-bottom: 2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .finup-app *, .finup-auth * { animation: none !important; scroll-behavior: auto !important; transition-duration: 0s !important; }
+}
