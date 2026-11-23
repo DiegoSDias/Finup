@@ -12,7 +12,7 @@
 <figure class="finup-finance-chart" aria-label="Entradas e despesas por mês em {{ $year }}">
     <svg viewBox="0 0 800 300" role="img" aria-labelledby="annual-chart-title annual-chart-description">
         <title id="annual-chart-title">Entradas e despesas em {{ $year }}</title>
-        <desc id="annual-chart-description">Comparação dos totais mensais já apresentados nos resumos. A linha verde mostra as entradas e a linha verde clara mostra as despesas.</desc>
+        <desc id="annual-chart-description">Comparação dos totais mensais já apresentados nos resumos. A linha verde mostra as entradas e a linha vermelha mostra as despesas.</desc>
         @foreach (range(0, 4) as $line)
             <line x1="55" y1="{{ 30 + $line * 57.5 }}" x2="770" y2="{{ 30 + $line * 57.5 }}" stroke="#ffffff18" />
             @if ($chartRange > 1)
@@ -20,8 +20,8 @@
             @endif
         @endforeach
         <path d="M55 20v240h715" fill="none" stroke="#ccc" stroke-width="1.5" />
-        <polyline points="{{ $chartPoints($chartIncome) }}" fill="none" stroke="#27ae60" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-        <polyline points="{{ $chartPoints($chartExpenses) }}" fill="none" stroke="#93e2ad" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <polyline points="{{ $chartPoints($chartIncome) }}" fill="none" stroke="var(--finup-chart-income)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        <polyline points="{{ $chartPoints($chartExpenses) }}" fill="none" stroke="var(--finup-chart-expense)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
         @foreach ($data['meses'] as $chartMonth)
             <text x="{{ 55 + ($loop->index * 65) }}" y="285" text-anchor="middle" fill="#ddd" font-size="11">{{ mb_substr($chartMonth['nome'], 0, 3) }}</text>
         @endforeach

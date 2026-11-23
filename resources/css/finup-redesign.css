@@ -3,6 +3,8 @@
     --finup-green: #27ae60;
     --finup-mint: #93e2ad;
     --finup-red: #ed7779;
+    --finup-chart-income: #22c55e;
+    --finup-chart-expense: #ef4444;
     --finup-border: #626262;
     --finup-panel: #1e1e1e;
     --finup-content-width: 88rem;
@@ -307,8 +309,8 @@ html:has(> body.finup-app) { background-color: #1d1d1d; }
 .finup-finance-chart { min-width: 0; color: #ddd; }
 .finup-finance-chart svg { width: 100%; height: auto; overflow: visible; }
 .finup-finance-chart figcaption { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: .875rem; padding: 1rem 2rem; }
-.finup-finance-chart figcaption span::before { content: ''; display: inline-block; width: 2rem; height: .2rem; background: #27ae60; vertical-align: middle; margin-right: .5rem; }
-.finup-finance-chart figcaption span:last-child::before { background: #93e2ad; }
+.finup-finance-chart figcaption span::before { content: ''; display: inline-block; width: 2rem; height: .2rem; background: var(--finup-chart-income); vertical-align: middle; margin-right: .5rem; }
+.finup-finance-chart figcaption span:last-child::before { background: var(--finup-chart-expense); }
 .finup-finance-chart .finup-chart-empty { margin-top: 1rem; color: #aaa; font-size: .875rem; }
 
 .finup-auth { min-height: 100svh; }
