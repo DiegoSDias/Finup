@@ -5,6 +5,7 @@
             <div>
                 <h1 class="text-3xl font-semibold text-white">Visão <span class="text-green-500">Financeira</span></h1>
                 <p class="mt-3 text-sm text-gray-300">Acompanhe como estão as suas finanças. Selecione o ano desejado.</p>
+                <a href="{{ route('analyses.index', ['year' => $anoSelecionado]) }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-green-300 underline underline-offset-4 hover:text-green-200">Ver análises e gráficos <span aria-hidden="true">→</span></a>
             </div>
             @php
                 $anoAtual = $anoSelecionado;
@@ -12,16 +13,20 @@
                 $anoProximo = $anoAtual + 1;
             @endphp
             <div class="finup-year-switcher flex items-center gap-3 text-white">
-                <a href="{{ route('finances.index', ['year' => $anoAnterior]) }}" aria-label="Ano anterior" class="rounded-lg border border-neutral-600 px-3 py-2 hover:bg-neutral-800">←</a>
+                @if ($anoAtual > 1900)
+                    <a href="{{ route('finances.index', ['year' => $anoAnterior]) }}" aria-label="Ano anterior" class="rounded-lg border border-neutral-600 px-3 py-2 hover:bg-neutral-800">←</a>
+                @endif
                 <details class="relative">
                     <summary class="cursor-pointer list-none rounded-lg border border-neutral-600 px-5 py-2 text-center"><span class="sr-only">Ano selecionado: </span>{{ $anoAtual }} <span aria-hidden="true" class="text-green-400">⌄</span></summary>
                     <div class="absolute right-0 z-20 mt-2 max-h-64 min-w-full overflow-y-auto rounded-lg border border-neutral-600 bg-neutral-900 py-1 shadow-xl">
-                        @foreach (range($anoSelecionado + 3, $anoSelecionado - 3) as $ano)
+                        @foreach (range(min(2100, $anoSelecionado + 3), max(1900, $anoSelecionado - 3)) as $ano)
                             <a href="{{ route('finances.index', ['year' => $ano]) }}" class="block px-5 py-2 hover:bg-neutral-800 {{ $ano == $anoAtual ? 'text-green-400' : 'text-white' }}">{{ $ano }}</a>
                         @endforeach
                     </div>
                 </details>
-                <a href="{{ route('finances.index', ['year' => $anoProximo]) }}" aria-label="Próximo ano" class="rounded-lg border border-neutral-600 px-3 py-2 hover:bg-neutral-800">→</a>
+                @if ($anoAtual < 2100)
+                    <a href="{{ route('finances.index', ['year' => $anoProximo]) }}" aria-label="Próximo ano" class="rounded-lg border border-neutral-600 px-3 py-2 hover:bg-neutral-800">→</a>
+                @endif
             </div>
         </div>
 

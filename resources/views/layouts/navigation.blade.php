@@ -21,6 +21,10 @@
                         {{ __('Finanças') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('analyses.index')" :active="request()->routeIs('analyses.*')" :aria-current="request()->routeIs('analyses.*') ? 'page' : null">
+                        {{ __('Análises') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                         {{ __('Categorias') }}
                     </x-nav-link>
@@ -132,6 +136,7 @@
                 Início
             </a>
             <a href="{{ route('finances.index') }}" @if(request()->routeIs('finances.*')) aria-current="page" @endif class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium {{ request()->routeIs('finances.*') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-white hover:text-slate-900' }}">Finanças</a>
+            <a href="{{ route('analyses.index') }}" @if(request()->routeIs('analyses.*')) aria-current="page" @endif class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium {{ request()->routeIs('analyses.*') ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-white hover:text-slate-900' }}">Análises</a>
             <a href="{{ route('categories.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-900">Categorias</a>
             <a href="{{ route('category-groups.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-white hover:text-slate-900">Grupos</a>
             <a href="{{ route('pluggy.connections') }}"

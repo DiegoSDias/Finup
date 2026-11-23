@@ -8,6 +8,7 @@ use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\RecurringExpenseController;
 use App\Http\Controllers\AccountPayableController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\FinancialAnalysisController;
 use App\Http\Controllers\Pluggy\PluggyController;
 use App\Http\Controllers\Pluggy\PluggyAccountController;
 use App\Http\Controllers\Pluggy\PluggyWebhookController;
@@ -26,6 +27,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group( function() {
     Route::get('/', [HomeController::class, 'index'])->name('dashboard');
     Route::get('/financas', [HomeController::class, 'finances'])->name('finances.index');
+    Route::get('/analises', [FinancialAnalysisController::class, 'index'])->name('analyses.index');
     Route::get('months/{year}/{month}', [MonthsController::class, 'show'])->name('month.show');
     Route::post('months/{year}/{month}', [MonthsController::class, 'close'])->name('month.close');
     Route::get('expenses/{expense}/confirm-delete', [ExpensesController::class, 'confirmDelete'])->name('expenses.confirm-delete');

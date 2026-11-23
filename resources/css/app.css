@@ -1,5 +1,6 @@
 @import './finup-redesign.css';
 @import './finup-controls.css';
+@import './financial-analysis.css';
 
 @tailwind base;
 @tailwind components;
