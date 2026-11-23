@@ -1,59 +1,159 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Grana sob Controle
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicação Laravel para controle de receitas e despesas manuais, com integração opcional de Open Finance pela Pluggy. As informações bancárias são buscadas pela Pluggy e persistidas no banco local antes de serem exibidas nos relatórios.
 
-## About Laravel
+## Executar com Docker
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+O ambiente de desenvolvimento conta com PHP 8.3, Nginx, MySQL 8.4 e um worker para a fila de sincronização. O banco é mantido no volume Docker `mysql-data`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Crie o arquivo de ambiente, caso ainda não exista: `Copy-Item .env.example .env`.
+2. Defina uma chave da aplicação em `APP_KEY` no `.env` (ou use `php artisan key:generate` uma única vez antes de subir os contêineres).
+3. Inicie o ambiente: `docker compose up --build`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+A aplicação estará disponível em `http://localhost:8080`. As migrations são aplicadas ao iniciar o serviço `app`, e o serviço `queue` processa os jobs em segundo plano. O MySQL também fica acessível no host pela porta `3309` com banco, usuário e senha `finup`.
 
-## Learning Laravel
+O worker usa tempo limite padrão de 240 segundos, alinhado aos jobs da Pluggy. O `retry_after` da fila de banco deve permanecer maior que esse tempo (o padrão é 300 segundos). O código é incorporado às imagens: após alterá-lo, execute `docker compose up --build` para reconstruí-las. O banco Docker é separado do banco local; apenas seus dados no volume `mysql-data` são persistidos entre recriações dos contêineres. Arquivos e logs armazenados dentro dos contêineres não possuem volume persistente configurado.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Para interromper os serviços, use `docker compose down`. Para remover também os dados locais do banco, use `docker compose down --volumes`.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Deploy na Vercel
 
-## Laravel Sponsors
+O deploy usa o [Container Runtime](https://vercel.com/docs/functions/runtimes/container) da Vercel, atualmente em beta. O arquivo `Dockerfile.vercel` tem prioridade sobre a detecção do Vite e monta uma imagem com PHP 8.3, FrankenPHP e os assets compilados. O Dockerfile e o Compose usados no desenvolvimento continuam independentes.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Os arquivos de deploy têm estas responsabilidades:
 
-### Premium Partners
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `Dockerfile.vercel` | Instalar as dependências de produção, compilar o frontend e montar a imagem da aplicação. |
+| `docker/vercel/Caddyfile` | Servir a pasta `public` por HTTP na porta informada em `PORT`, com padrão 80. A Vercel fornece o HTTPS público. |
+| `docker/vercel/entrypoint.sh` | Preparar os diretórios temporários usados pelo Laravel e iniciar o comando da imagem. |
+| `vercel.json` | Manter um worker da fila como Vercel Daemon, usando a mesma imagem e um comando diferente. |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Banco e variáveis de ambiente
 
-## Contributing
+É necessário um **MySQL externo e persistente**, acessível pela Vercel. O serviço `db` do Compose e o endereço `localhost` não ficam disponíveis no deploy. Sessões, cache e fila também usam esse banco. Configure TLS conforme as instruções do provedor; se ele exigir um certificado CA, `MYSQL_ATTR_SSL_CA` deve apontar para o arquivo disponibilizado no contêiner.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Em **Environment Variables**, cadastre os valores reais para **Production**:
 
-## Code of Conduct
+```env
+APP_NAME=Finup
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://seu-projeto.vercel.app
+APP_KEY=base64:SUBSTITUA_PELA_CHAVE_DA_APLICACAO
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+DB_CONNECTION=mysql
+DB_HOST=host-do-mysql
+DB_PORT=3306
+DB_DATABASE=finup
+DB_USERNAME=usuario-do-mysql
+DB_PASSWORD=senha-do-mysql
 
-## Security Vulnerabilities
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+DB_QUEUE_RETRY_AFTER=300
+LOG_CHANNEL=stderr
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+PLUGGY_CLIENT_ID=seu-client-id
+PLUGGY_CLIENT_SECRET=seu-client-secret
+PLUGGY_BASE_URL=https://api.pluggy.ai
+PLUGGY_WEBHOOK_SECRET=seu-segredo-longo
+PLUGGY_WEBHOOK_URL=https://seu-projeto.vercel.app/webhooks/pluggy?token=seu-segredo-longo
+```
 
-## License
+Use a mesma `APP_KEY` em todos os deploys desse ambiente. Se for uma instalação nova, gere a chave uma única vez com `php artisan key:generate --show` e salve o resultado no painel. Deixe `SESSION_DOMAIN` sem configuração para o cookie usar o domínio acessado. As variáveis `VITE_*` são públicas no frontend e não devem conter credenciais.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Preparar o banco e publicar
+
+1. Construa a imagem: `docker build --file Dockerfile.vercel --tag finup-vercel .`.
+2. Para aplicar as migrations, coloque as variáveis reais em um arquivo local `.env.production` (ignorado pelo Git) e execute `docker run --rm --env-file .env.production finup-vercel php artisan migrate --force`. Faça isso como uma etapa controlada antes de liberar tráfego. As migrations não são executadas automaticamente a cada inicialização.
+3. Envie os arquivos para a branch do GitHub que será usada no deploy.
+4. Importe o repositório na Vercel com **Root Directory** `./` e **Application Preset** **Container**. Remova eventuais comandos personalizados de Build, Install e Output Directory do Vite; a imagem faz essas etapas.
+5. Cadastre as variáveis de ambiente, publique e confira `/up`, o login e os logs do worker em **Daemons**. Se a Vercel atribuir uma URL diferente, atualize `APP_URL` e `PLUGGY_WEBHOOK_URL` e faça um novo deploy.
+
+O daemon `queue` possui uma instância com 1 GiB de memória em `iad1`. Ajuste a região em `vercel.json` e a região da função no painel para ficarem próximas ao banco contratado. O tempo de encerramento de 300 segundos permite concluir os jobs que têm limite de 240 segundos. A configuração segue a [referência dos Daemons](https://vercel.com/docs/daemons/config-reference).
+
+Daemons estão em beta e executam apenas em **Production**. Para Preview, use um banco e credenciais separados; jobs enfileirados nesse banco precisarão de um worker próprio. O worker de produção permanece ativo e seu consumo deve ser acompanhado no painel.
+
+A imagem grava views e caches temporários em `/tmp` e envia logs para `stderr`. Esses arquivos não são persistentes. Uploads que precisem sobreviver a um novo contêiner devem usar armazenamento externo. O Laravel confia nos cabeçalhos do proxy apenas quando `DEPLOY_TARGET=vercel`, definido pela imagem de deploy.
+
+## O que a integração faz
+
+- Abre o Pluggy Connect sem expor `PLUGGY_CLIENT_SECRET` ao navegador.
+- Associa cada Item Pluggy ao usuário autenticado da aplicação.
+- Sincroniza contas, cartões e transações de forma assíncrona.
+- Mantém cópias locais idempotentes: sincronizar novamente atualiza, não duplica.
+- Soma apenas receitas e despesas economicamente válidas; ignora pendências, transferências internas e pagamento de fatura já representada pelas compras do cartão.
+- Registra estornos e cashback como reversão de despesa.
+- Processa webhooks rapidamente, com deduplicação por `eventId` e processamento em fila.
+
+## Configuração
+
+Copie o ambiente e preencha somente no servidor:
+
+```env
+PLUGGY_CLIENT_ID=
+PLUGGY_CLIENT_SECRET=
+PLUGGY_BASE_URL=https://api.pluggy.ai
+PLUGGY_WEBHOOK_SECRET=gere-um-segredo-longo
+PLUGGY_WEBHOOK_URL=https://seu-dominio.com/webhooks/pluggy?token=gere-um-segredo-longo
+PLUGGY_API_KEY_CACHE_MINUTES=105
+```
+
+Nunca coloque credenciais da Pluggy em JavaScript, repositório ou logs. A chave de API temporária é obtida no backend e fica em cache pelo tempo configurado.
+
+Execute as migrations e mantenha um worker ativo para os jobs de sincronização e webhooks:
+
+```bash
+php artisan migrate
+php artisan queue:work --tries=3
+```
+
+Em desenvolvimento, `composer run dev` já inicia o worker. Para receber webhooks localmente, exponha uma URL HTTPS pública (por exemplo, com um túnel) e atualize `PLUGGY_WEBHOOK_URL`.
+
+## Fluxo de uso
+
+1. Entre no painel e escolha **Conectar banco**.
+2. Conclua o fluxo do Pluggy Connect.
+3. O navegador envia somente o `itemId` à rota autenticada `POST /pluggy/items`.
+4. A aplicação valida a posse do Item, associa-o ao usuário atual e coloca a sincronização na fila.
+5. Acesse **Conexões** para acompanhar contas locais, última sincronização, solicitar atualização ou remover a conexão.
+
+Para um Item criado no MeuPluggy, use o campo **Vincular conexão existente** no painel. Esse caminho é destinado ao Item da própria pessoa; um Item já associado a outro usuário local é recusado.
+
+## Webhook
+
+Configure na Pluggy a mesma URL de `PLUGGY_WEBHOOK_URL`. A rota pública é `POST /webhooks/pluggy` e:
+
+- aceita apenas JSON;
+- valida o segredo opcional via `?token=`;
+- salva e deduplica o evento pelo `eventId`;
+- retorna `2xx` sem esperar a sincronização;
+- envia a atualização de Item ou transações para a fila.
+
+Para conferir problemas, use `php artisan pail` ou os logs da aplicação. O sistema registra IDs técnicos e status, não credenciais ou dados bancários sensíveis.
+
+## Modelo local
+
+- `pluggy_items`: conexão por usuário e estado de sincronização;
+- `pluggy_accounts`: contas/cartões e saldos persistidos localmente;
+- `pluggy_transactions`: transações normalizadas, classificação, categoria e payload técnico;
+- `pluggy_webhook_events`: eventos recebidos, deduplicação e status de processamento.
+
+Números de documentos e contas usados para detectar transferências internas ficam apenas como HMAC; a interface mostra, no máximo, os quatro últimos dígitos. Remover uma conexão a desativa junto com seus lançamentos importados, preservando todos os lançamentos manuais.
+
+## Testes
+
+```bash
+php artisan test
+```
+
+Os testes cobrem classificação de entradas, despesas, estornos e pagamento de fatura, idempotência de importação, transferência interna por referência PIX e deduplicação de webhook. O ambiente de teste usa SQLite; habilite a extensão `pdo_sqlite` no PHP de linha de comando caso ela ainda não esteja disponível.
+
+## Referências Pluggy
+
+- [Autenticação e Connect Token](https://docs.pluggy.ai/pt/docs/authentication)
+- [Transações paginadas](https://v2.docs.pluggy.ai/en/reference/transactions-list-by-cursor)
+- [Webhooks](https://docs.pluggy.ai/pt/reference/webhooks)

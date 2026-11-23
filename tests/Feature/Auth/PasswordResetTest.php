@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -69,5 +71,24 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_invalid_and_expired_reset_tokens_do_not_change_password(): void
+    {
+        $user = User::factory()->create();
+        $token = Password::broker()->createToken($user);
+
+        $this->post('/reset-password', [
+            'token' => 'invalid-token', 'email' => $user->email,
+            'password' => 'new-password', 'password_confirmation' => 'new-password',
+        ])->assertSessionHasErrors('email');
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
+
+        $this->travel(61)->minutes();
+        $this->post('/reset-password', [
+            'token' => $token, 'email' => $user->email,
+            'password' => 'new-password', 'password_confirmation' => 'new-password',
+        ])->assertSessionHasErrors('email');
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 }

@@ -1,0 +1,168 @@
+/* One field style for the entire application, based on the movement forms. */
+:root {
+    --finup-control-height: 2.75rem;
+    --finup-control-font: 1rem;
+    --finup-control-padding: .875rem;
+    --finup-control-radius: .625rem;
+    --finup-label-gap: .5rem;
+    --finup-field-gap: 1.25rem;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+:is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]), select, textarea) {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--finup-control-height);
+    margin-top: 0;
+    padding-block: .5625rem;
+    padding-inline-start: var(--finup-control-padding-start, var(--finup-control-padding));
+    padding-inline-end: var(--finup-control-padding-end, var(--finup-control-padding));
+    border: 1px solid #565656;
+    border-radius: var(--finup-control-radius);
+    background-color: #383838;
+    color: #eee;
+    color-scheme: dark;
+    font-family: inherit;
+    font-size: var(--finup-control-font);
+    font-weight: 400;
+    line-height: 1.4;
+    box-shadow: none;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+:is(input, textarea)::placeholder { color: #b0b0b0; opacity: 1; }
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+:is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]), select, textarea):focus {
+    border-color: var(--finup-mint);
+    --tw-ring-color: #93e2ad66;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content) select {
+    --finup-control-padding-end: 2.25rem;
+    appearance: none;
+    /* Older form partials define their decorative chevron inline. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4d4d4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 1rem;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content) select[multiple] {
+    background-image: none !important;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content) input.pl-12 {
+    --finup-control-padding-start: 3.5rem;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content) textarea {
+    min-height: calc(var(--finup-control-height) * 2);
+    resize: vertical;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+form label:not(:has(input[type=checkbox], input[type=radio])) {
+    display: block;
+    margin-top: 0;
+    margin-bottom: var(--finup-label-gap);
+    color: #eee;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+form label:has(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea) {
+    margin-bottom: 0;
+}
+
+:is(.finup-app .finup-theme, .finup-auth .finup-auth-content)
+label :is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]), select, textarea) {
+    display: block;
+    margin-top: var(--finup-label-gap);
+}
+
+.finup-app .finup-theme form.grid { row-gap: var(--finup-field-gap); }
+.finup-app .finup-theme form :is(.space-y-5, .space-y-6) > :not([hidden]):not(.hidden):not([type=hidden]) ~ :not([hidden]):not(.hidden):not([type=hidden]),
+.finup-app .finup-theme form.space-y-6 > :not([hidden]):not(.hidden):not([type=hidden]) ~ :not([hidden]):not(.hidden):not([type=hidden]) {
+    margin-top: var(--finup-field-gap);
+}
+
+.finup-app .finup-theme :is(#installmentsField, #newBankField, .finup-new-bank) {
+    margin-top: var(--finup-field-gap);
+}
+.finup-app .finup-theme form > :is(input:not([type=hidden]), select, textarea) + label {
+    margin-top: var(--finup-field-gap);
+}
+
+.finup-movement-heading :is(h1, .finup-page-intro) { text-align: center; }
+
+/* Rule forms need room for the same full-size fields used elsewhere. */
+.finup-connections form.flex:has(> label) > label {
+    flex: 1 1 12rem;
+    min-width: 0;
+    max-width: 100%;
+}
+.finup-transaction-rule-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--finup-field-gap) 1rem;
+    align-items: end;
+}
+.finup-connections .finup-transaction-rule-form > button { min-height: var(--finup-control-height); }
+.finup-connections .finup-rule-edit-trigger { border-color: #565656; background: #242424; color: #eee; }
+.finup-connections .finup-rule-edit-trigger:hover { border-color: var(--finup-mint); background: #333; }
+
+.finup-month-details .finup-filter-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem .75rem;
+    align-items: end;
+}
+.finup-filter-fields > div { min-width: 0; }
+.finup-filter-actions { display: flex; gap: .5rem; }
+.finup-month-details .finup-filter-actions > :is(button, a) {
+    box-sizing: border-box;
+    min-height: var(--finup-control-height);
+    justify-content: center;
+    padding-block: .5625rem;
+    padding-inline: var(--finup-control-padding);
+    border: 1px solid transparent;
+    font-size: var(--finup-control-font);
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.finup-filter-actions > :is(button, a) > svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+
+@media (min-width: 640px) {
+    .finup-month-details .finup-filter-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+    .finup-month-details .finup-filter-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .finup-month-details .finup-movement-filters--income .finup-filter-fields {
+        grid-template-columns: minmax(12rem, 1.7fr) minmax(10rem, 1fr) minmax(10rem, 1fr) minmax(7rem, .7fr) max-content;
+    }
+}
+@media (min-width: 1280px) {
+    .finup-month-details .finup-movement-filters--expense .finup-filter-fields {
+        grid-template-columns: minmax(11.5rem, 1.6fr) minmax(10rem, 1.3fr) minmax(6rem, .7fr) minmax(10rem, 1fr) minmax(10rem, 1fr) minmax(6.5rem, .7fr) max-content;
+    }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .finup-month-details .finup-movement-filters--income .finup-filter-fields:has(.finup-filter-actions a) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1439px) {
+    .finup-movement-filters--expense .finup-filter-actions:has(a) { grid-column: 1 / -1; }
+}
+@media (max-width: 1023px) {
+    .finup-filter-actions { grid-column: 1 / -1; flex-wrap: wrap; }
+}
+
+@media (min-width: 768px) {
+    .finup-transaction-rule-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px) {
+    .finup-transaction-rule-form { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.4fr) auto; }
+}

@@ -137,47 +137,60 @@
         <p class="mt-1.5 text-xs text-blue-600">Digite o nome da nova categoria e ela será criada automaticamente</p>
     </div>
 
+    @php
+        $initialBank = isset($expense) ? ($expense->bank_status === 'bank' ? (string) $expense->manual_bank_id : ($expense->bank_status ?? 'unknown')) : '';
+        $singleBankEdit = isset($expense) && $expense->installments_group && old('installment_scope', 'single') === 'single';
+        $isRecurring = isset($expense) && $expense->recurring_expense_id;
+    @endphp
+    <div id="bankControls" @class(['hidden' => $singleBankEdit])>
+        <label for="bankChoice" class="block text-sm font-semibold text-slate-700 mb-2">Banco da movimentação</label>
+        <select id="bankChoice" name="bank_choice" class="w-full rounded-xl border-slate-200">
+            <option value="">Selecione uma opção</option>
+            @if(isset($expense) && $expense->bank_status === null)
+                <option value="unknown" @selected(old('bank_choice', $initialBank) === 'unknown')>Banco não informado (registro antigo)</option>
+            @endif
+            <option value="none" @selected(old('bank_choice', $initialBank) === 'none')>Não realizado por meio de um banco</option>
+            @foreach ($banks as $bank)
+                <option value="{{ $bank->id }}" @selected((string) old('bank_choice', $initialBank) === (string) $bank->id)>{{ $bank->name }}</option>
+            @endforeach
+            <option value="new" @selected(old('bank_choice') === 'new')>Cadastrar outro banco</option>
+        </select>
+        <div id="newBankField" @class(['hidden' => old('bank_choice') !== 'new'])>
+            <label for="newBank" class="block text-sm font-semibold mt-3">Nome do banco</label>
+            <input id="newBank" name="new_bank" value="{{ old('new_bank') }}" maxlength="100" class="w-full rounded-xl border-slate-200">
+        </div>
+        @error('bank_choice') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+        @error('new_bank') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+    </div>
+
     @if ($type == 'expense')
         {{-- Modo de Pagamento --}}
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-3">
                 Modo de Pagamento
             </label>
-            <div class="grid grid-cols-2 gap-3">
-                <label class="relative flex items-center px-4 py-3 bg-white border-2 border-slate-200 rounded-xl cursor-pointer hover:border-purple-300 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 transition-all group">
-                    <input
-                        type="radio"
-                        name="payment_mode"
-                        value="pix"
-                        class="sr-only"
-                        {{ old('payment_mode', $expense->payment_mode ?? 'pix') === 'pix' ? 'checked' : '' }}
-                    >
-                    <div class="flex items-center gap-3">
-                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 group-has-[:checked]:border-purple-500 group-has-[:checked]:bg-purple-500 flex items-center justify-center transition-all">
-                            <div class="w-2 h-2 bg-white rounded-full opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                        </div>
-                        <span class="text-sm font-medium text-slate-700 group-has-[:checked]:text-purple-700">Pix</span>
-                    </div>
-                </label>
-
-                <label class="relative flex items-center px-4 py-3 bg-white border-2 border-slate-200 rounded-xl cursor-pointer hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 transition-all group">
-                    <input
-                        type="radio"
-                        name="payment_mode"
-                        value="cartao"
-                        class="sr-only"
-                        {{ old('payment_mode', $expense->payment_mode ?? '') === 'cartao' ? 'checked' : '' }}
-                    >
-                    <div class="flex items-center gap-3">
-                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 group-has-[:checked]:border-amber-500 group-has-[:checked]:bg-amber-500 flex items-center justify-center transition-all">
-                            <div class="w-2 h-2 bg-white rounded-full opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                        </div>
-                        <span class="text-sm font-medium text-slate-700 group-has-[:checked]:text-amber-700">Cartão</span>
-                    </div>
-                </label>
-            </div>
+            <select name="payment_mode" class="w-full rounded-xl border-slate-200">
+                <option value="">Selecione uma forma de pagamento</option>
+                @foreach (['pix' => 'Pix', 'dinheiro' => 'Dinheiro', 'debito' => 'Cartão de débito', 'credito' => 'Cartão de crédito'] as $value => $label)
+                    <option value="{{ $value }}" @selected(old('payment_mode', $expense->payment_mode ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+                @if(isset($expense) && $expense->payment_mode === 'cartao')
+                    <option value="cartao" @selected(old('payment_mode', $expense->payment_mode) === 'cartao')>Cartão — modalidade não informada</option>
+                @endif
+            </select>
+            @error('payment_mode') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
         </div>
 
+        @if (! empty($expense->pluggy_installment_source_id))
+        <div>
+            <label for="currentInstallment" class="block text-sm font-semibold text-slate-700 mb-2">Número desta parcela</label>
+            <input id="currentInstallment" type="number" name="current_installment" min="1" max="{{ $expense->total_installments }}" required value="{{ old('current_installment', $expense->current_installment) }}" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl">
+            <p class="mt-1 text-xs text-slate-500">Parcela de um total de {{ $expense->total_installments }}. Essa alteração afeta apenas este lançamento.</p>
+            @error('current_installment') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+        @endif
+        @if (! $isRecurring && empty($expense->pluggy_installment_source_id))
+        <div id="installmentControls" @class(['hidden' => isset($expense) && $expense->installments_group && old('installment_scope', 'single') === 'single'])>
         {{-- Compra parcelada --}}
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-3">
@@ -234,6 +247,8 @@
             >
             <p class="mt-1.5 text-xs text-blue-600">Número mínimo de parcelas: 2</p>
         </div>
+        </div>
+        @endif
     @endif
 
     {{-- Campos ocultos --}}
@@ -247,8 +262,29 @@
     document.addEventListener('DOMContentLoaded', function () {
         const installmentRadios = document.querySelectorAll('input[name="is_installment"]');
         const installmentsField = document.getElementById('installmentsField');
+        const installmentControls = document.getElementById('installmentControls');
+        const scopeSelect = document.getElementById('installmentScope');
+        const bankControls = document.getElementById('bankControls');
+        const bankChoice = document.getElementById('bankChoice');
+        const newBankField = document.getElementById('newBankField');
+
+        function toggleBank() {
+            const single = scopeSelect && scopeSelect.value === 'single';
+            bankControls.classList.toggle('hidden', Boolean(single));
+            bankControls.querySelectorAll('input, select').forEach(input => input.disabled = Boolean(single));
+            newBankField.classList.toggle('hidden', bankChoice.value !== 'new');
+        }
+        if (bankChoice) bankChoice.addEventListener('change', toggleBank);
+        if (scopeSelect) scopeSelect.addEventListener('change', toggleBank);
+        toggleBank();
 
         function toggleInstallmentsField() {
+            if (!installmentsField) return;
+            const single = scopeSelect && scopeSelect.value === 'single';
+            if (installmentControls && scopeSelect) {
+                installmentControls.classList.toggle('hidden', single);
+                installmentControls.querySelectorAll('input').forEach(input => input.disabled = single);
+            }
             const selected = document.querySelector('input[name="is_installment"]:checked');
             
             if (selected && selected.value === '1') {
@@ -265,5 +301,6 @@
         installmentRadios.forEach(radio => {
             radio.addEventListener('change', toggleInstallmentsField);
         });
+        if (scopeSelect) scopeSelect.addEventListener('change', toggleInstallmentsField);
     });
 </script>

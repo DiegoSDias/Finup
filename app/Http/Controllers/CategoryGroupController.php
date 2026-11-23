@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CategoryGroupController extends Controller
 {
@@ -13,7 +15,7 @@ class CategoryGroupController extends Controller
      */
     public function index(Request $request)
     {
-        $groups = Group::with('categories')
+        $groups = Group::with(['categories' => fn ($query) => $query->where('user_id', $request->user()->id)])
                         ->where('user_id', $request->user()->id)->get();
 
         return view('groups.index', compact('groups'));
@@ -43,25 +45,13 @@ class CategoryGroupController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = $request->user()->id;
-        $name = $request->name;
-        $income = $request->input('income_categories', []);
-        $expense = $request->input('expense_categories', []);
-
-        $categories_id = array_merge($income, $expense);
-        
-        $group = Group::create([
-            'user_id' => $user_id,
-            'name' => $name
-        ]);
-
-        foreach($categories_id as $category_id) {
-            $category = Category::find($category_id);
-
-            $category->update([
-                'group_id' => $group->id
-            ]);
-        }
+        $data = $this->validateGroup($request);
+        DB::transaction(function () use ($request, $data) {
+            $group = Group::create(['user_id' => $request->user()->id, 'name' => $data['name']]);
+            Category::where('user_id', $request->user()->id)
+                ->whereIn('id', array_merge($data['income_categories'] ?? [], $data['expense_categories'] ?? []))
+                ->update(['group_id' => $group->id]);
+        });
 
         return redirect()->route('category-groups.index');
     }
@@ -71,7 +61,7 @@ class CategoryGroupController extends Controller
      */
     public function show(string $id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -79,7 +69,8 @@ class CategoryGroupController extends Controller
      */
     public function edit(string $id, Request $request)
     {
-        $group = Group::with('categories')->findOrFail($id);
+        $group = Group::with(['categories' => fn ($query) => $query->where('user_id', $request->user()->id)])
+            ->where('user_id', $request->user()->id)->findOrFail($id);
 
 
         $incomeCategories = Category::where('user_id', $request->user()->id)
@@ -110,25 +101,14 @@ class CategoryGroupController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $group = Group::find($id);
-
-        $name = $request->name;
-        $income = $request->input('income_categories', []);
-        $expense = $request->input('expense_categories', []);
-
-        $categories_id = array_merge($income, $expense);
-
-        $group->update([
-            'name' => $name
-        ]);
-
-        foreach($categories_id as $category_id) {
-            $category = Category::find($category_id);
-
-            $category->update([
-                'group_id' => $group->id
-            ]);
-        }
+        $group = Group::where('user_id', $request->user()->id)->findOrFail($id);
+        $data = $this->validateGroup($request);
+        DB::transaction(function () use ($request, $group, $data) {
+            $group->update(['name' => $data['name']]);
+            Category::where('user_id', $request->user()->id)
+                ->whereIn('id', array_merge($data['income_categories'] ?? [], $data['expense_categories'] ?? []))
+                ->update(['group_id' => $group->id]);
+        });
 
         return redirect()->route('category-groups.index');
         
@@ -137,12 +117,23 @@ class CategoryGroupController extends Controller
         /**
          * Remove the specified resource from storage.
         */
-        public function destroy(string $id)
+        public function destroy(Request $request, string $id)
         {
-            $group = Group::find($id);
-            
+            $group = Group::where('user_id', $request->user()->id)->findOrFail($id);
+            abort_if($group->categories()->where('user_id', '!=', $request->user()->id)->exists(), 409);
             $group->delete();
 
         return redirect()->route('category-groups.index');
+    }
+
+    private function validateGroup(Request $request): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'income_categories' => ['sometimes', 'array'],
+            'income_categories.*' => ['required', 'integer', 'distinct', Rule::exists('categories', 'id')->where('user_id', $request->user()->id)->where('type', 'income')],
+            'expense_categories' => ['sometimes', 'array'],
+            'expense_categories.*' => ['required', 'integer', 'distinct', Rule::exists('categories', 'id')->where('user_id', $request->user()->id)->where('type', 'expense')],
+        ]);
     }
 }

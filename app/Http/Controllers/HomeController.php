@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FinancialAnalysisRequest;
 use App\Services\HomeService;
-use Illuminate\Support\Facades\Request;
 
 class HomeController extends Controller
 {
-    public function index(Request $request, HomeService $homeService)
+    public function index()
     {
-        $anoSelecionado = $request->year ?? date('Y');
+        return view('dashboard');
+    }
+
+    public function finances(FinancialAnalysisRequest $request, HomeService $homeService)
+    {
+        $anoSelecionado = (int) ($request->validated()['year'] ?? now()->year);
         $data = $homeService->index($anoSelecionado);
- 
-        return view('dashboard', compact('data', 'anoSelecionado'));
+
+        return view('finances.index', compact('data', 'anoSelecionado'));
     }
 }

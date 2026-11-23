@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    @if ($expenses->isEmpty())
+    @if (! $hasMovements)
         @include('months.empty')
     @else
         @include('expenses.index')

@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.vercel
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,3 +23,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+
+/output
+/planejamento
+/tools

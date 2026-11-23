@@ -1,0 +1,2 @@
+<span class="finup-logo-mark relative block h-20 w-20 overflow-hidden" aria-hidden="true"><img src="{{ asset('images/finup/marca.png') }}" alt="" class="absolute h-full max-w-none" style="width:242.51%;left:-81.29%"></span>
+<span class="finup-logo-word relative block h-10 w-48 overflow-hidden" aria-hidden="true"><img src="{{ asset('images/finup/logotipo.png') }}" alt="" class="absolute max-w-none" style="height:865.53%;width:154.91%;left:-26.99%;top:-515.49%"></span>

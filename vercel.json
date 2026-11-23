@@ -1,0 +1,27 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "daemons": {
+        "queue": {
+            "root": ".",
+            "entrypoint": "Dockerfile.vercel",
+            "command": [
+                "/usr/local/bin/finup-start",
+                "php",
+                "artisan",
+                "queue:work",
+                "--tries=3",
+                "--timeout=240",
+                "--sleep=3"
+            ],
+            "instances": {
+                "iad1": 1
+            },
+            "resources": {
+                "requests": {
+                    "memory": "1Gi"
+                }
+            },
+            "terminationGracePeriodSeconds": 300
+        }
+    }
+}

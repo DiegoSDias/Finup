@@ -3,9 +3,18 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Expense;
 
 class ExpensesRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        if ($this->route('expense') !== null) {
+            abort_unless(Expense::where('user_id', $this->user()->id)->whereKey($this->route('expense'))->exists(), 404);
+        }
+
+        return true;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -17,16 +26,67 @@ class ExpensesRequest extends FormRequest
      */
     public function rules(): array
     {
+        $expense = $this->route('expense') !== null
+            ? Expense::where('user_id', $this->user()->id)->find($this->route('expense')) : null;
+        $single = $expense?->installments_group && $this->input('installment_scope') === 'single';
+        $paymentModes = ['pix', 'dinheiro', 'debito', 'credito'];
+        if ($expense?->payment_mode === 'cartao') {
+            $paymentModes[] = 'cartao';
+        }
         return [
             'description' => 'nullable|string|max:255',
             'date' => 'required|date',
-            'amount' => 'required|numeric|min:0.01',
-            'category_id' => 'nullable',
-            'new_category' => 'nullable|string|max:100',
-            'payment_mode' => 'nullable|required_if:type,expense|in:pix,cartao',
+            'amount' => ['required', 'numeric', 'min:0.01', 'max:99999999.99', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'category_id' => ['required', function ($attribute, $value, $fail) {
+                if ($value !== 'new' && (! is_scalar($value) || ! ctype_digit((string) $value) || ! \App\Models\Category::where('user_id', $this->user()->id)->where('type', $this->input('type'))->whereKey($value)->exists())) {
+                    $fail('Escolha uma categoria válida para o tipo da movimentação.');
+                }
+            }],
+            'new_category' => 'nullable|required_if:category_id,new|string|max:100',
+            'payment_mode' => ['nullable', 'required_if:type,expense', \Illuminate\Validation\Rule::in($paymentModes)],
+            'bank_choice' => [\Illuminate\Validation\Rule::requiredIf(! $single), 'nullable', function ($attribute, $value, $fail) use ($expense, $single) {
+                if ($single) return;
+                if ($value === 'none' || $value === 'new') return;
+                if ($value === 'unknown' && $expense && $expense->bank_status === null) return;
+                if (! is_scalar($value) || ! ctype_digit((string) $value) || ! \App\Models\ManualBank::where('user_id', $this->user()->id)->whereKey($value)->exists()) {
+                    $fail('Escolha um banco válido ou informe que não foi realizado por meio de banco.');
+                }
+            }],
+            'new_bank' => ['nullable', 'required_if:bank_choice,new', 'string', 'max:100'],
             'type' => 'required|in:income,expense',
-            'is_installment' => 'boolean',
-            'total_installments' => 'nullable|required_if:is_installment,true|integer|min:2'
+            'is_installment' => ['boolean', function ($attribute, $value, $fail) use ($expense) {
+                if ($expense?->pluggy_installment_source_id && filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                    $fail('Uma parcela manual vinculada não pode ser transformada em um novo parcelamento.');
+                }
+            }],
+            'current_installment' => [
+                'sometimes', 'required', 'integer', 'min:1',
+                function ($attribute, $value, $fail) use ($expense) {
+                    if (! $expense?->pluggy_installment_source_id) {
+                        $fail('O número da parcela só pode ser alterado em uma parcela manual vinculada.');
+                        return;
+                    }
+                    if ((int) $value > (int) $expense->total_installments) {
+                        $fail('O número da parcela não pode ser maior que o total de parcelas.');
+                        return;
+                    }
+                    if (Expense::where('user_id', $this->user()->id)
+                        ->where('pluggy_installment_source_id', $expense->pluggy_installment_source_id)
+                        ->where('current_installment', $value)->whereKeyNot($expense->id)->exists()) {
+                        $fail('Já existe uma parcela manual com este número vinculada a esta transação.');
+                    }
+                },
+            ],
+            'total_installments' => [
+                \Illuminate\Validation\Rule::requiredIf(fn () => $this->boolean('is_installment') && ! (
+                    $this->input('installment_scope') === 'single'
+                    && $this->route('expense') !== null
+                    && Expense::where('user_id', $this->user()->id)->whereKey($this->route('expense'))->whereNotNull('installments_group')->exists()
+                )),
+                'nullable', 'integer', 'min:2', 'max:255',
+            ],
+            'installment_scope' => 'nullable|in:single,group',
+            'recurrence_scope' => 'nullable|in:single,future',
         ];
     }
 }

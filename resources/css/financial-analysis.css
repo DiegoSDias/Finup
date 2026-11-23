@@ -1,0 +1,97 @@
+.finup-analyses { width: min(100%, calc(88rem + var(--finup-page-gutter) * 2)); margin-inline: auto; padding: 2rem var(--finup-page-gutter) 4rem; }
+.finup-analyses > .finup-back { margin-bottom: 1.5rem; }
+.finup-analysis-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.5rem; }
+.finup-analysis-eyebrow { color: #93e2ad; font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.finup-analysis-heading h1 { margin-top: .5rem; color: #fff; font-size: clamp(1.75rem, 3vw, 2.25rem); font-weight: 600; line-height: 1.25; }
+.finup-analysis-heading h1 span { color: #93e2ad; }
+.finup-analysis-heading h1 + p { max-width: 35rem; margin-top: .75rem; color: #bdc8c0; font-size: .9375rem; line-height: 1.6; }
+.finup-analysis-period { display: flex; align-items: center; gap: .75rem; }
+.finup-analysis-period span { color: #e7eee9; font-size: .875rem; }
+.finup-analysis-period a { display: grid; place-items: center; width: 2.75rem; min-height: 2.75rem; border: 1px solid #4d5a51; border-radius: .6rem; color: #a7edbf; }
+.finup-analysis-period a:hover { background: #2d3b31; }
+.finup-analysis-filters { margin-top: 1.75rem; padding: 1.25rem; border: 1px solid #465149; border-radius: .875rem; background: #1d2420; }
+.finup-analysis-filter-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.finup-analysis-filter-grid > div { min-width: 0; }
+.finup-analysis-filter-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; }
+.finup-analysis-filter-footer > p { color: #b1bab3; font-size: .75rem; line-height: 1.6; }
+.finup-analysis-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.finup-analysis-actions :is(a, button) { display: inline-flex; align-items: center; justify-content: center; gap: .875rem; min-height: var(--finup-control-height); padding: .625rem 1rem; border: 1px solid #59635c; border-radius: var(--finup-control-radius); font-size: .875rem; font-weight: 500; }
+.finup-analysis-actions a { color: #e3e9e5; }
+.finup-analysis-actions button { border-color: #93e2ad; background: #93e2ad; color: #14271b; }
+.finup-analysis-actions a:hover { background: #303a33; }
+.finup-analysis-actions button:hover { background: #b6f1c9; }
+.finup-analyses :is(a, button, summary, [tabindex]):focus-visible { outline: 2px solid #93e2ad; outline-offset: 4px; }
+.finup-analysis-totals { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; margin-block: 1.5rem; }
+.finup-analysis-totals > div { display: flex; flex-direction: column; gap: .75rem; padding: 1.5rem; border: 1px solid #465149; border-radius: .875rem; background: #202823; }
+.finup-analysis-totals span { color: #d0dbd3; font-size: .875rem; }
+.finup-analysis-totals strong { font-size: clamp(1.375rem, 2.4vw, 1.875rem); font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.finup-analysis-totals small { color: #aebbb2; font-size: .75rem; line-height: 1.5; }
+.finup-analysis-income { color: #a7edbf; }
+.finup-analysis-expense { color: #f87171; }
+.finup-analysis-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.finup-analysis-card { min-width: 0; padding: clamp(1.25rem, 2vw, 1.75rem); border: 1px solid #465149; border-radius: 1rem; background: #1f2622; scroll-margin-top: 1rem; }
+.finup-analysis-card > header { margin-bottom: 1.5rem; }
+.finup-analysis-card > header > div { display: flex; align-items: baseline; gap: .75rem; }
+.finup-analysis-number { color: #8ca493; font-size: .75rem; font-variant-numeric: tabular-nums; }
+.finup-analysis-card h2 { color: #f1f6f3; font-size: 1.125rem; font-weight: 600; line-height: 1.5; }
+.finup-analysis-card > header p { margin-top: .5rem; color: #b1bab3; font-size: .8125rem; line-height: 1.6; }
+.finup-analysis-legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; color: #c4d0c7; font-size: .75rem; }
+.finup-analysis-legend > span { display: inline-flex; align-items: center; gap: .5rem; }
+.finup-analysis-legend > span::before { content: ''; width: .6rem; height: .6rem; border-radius: .15rem; background: var(--finup-chart-income); }
+.finup-analysis-legend > .finup-analysis-legend-expense::before { background: var(--finup-chart-expense); }
+.finup-analysis-svg-scroll, .finup-analysis-table-scroll { max-width: 100%; overflow-x: auto; }
+.finup-analysis-svg { width: 100%; min-width: 30rem; height: auto; }
+.finup-analysis-data { margin-top: .75rem; border-top: 1px solid #465149; padding-top: .75rem; color: #b6c6bb; font-size: .75rem; }
+.finup-analysis-data summary { width: fit-content; cursor: pointer; }
+.finup-analysis-table-scroll { max-height: 20rem; margin-top: .75rem; }
+.finup-analysis-data table { width: 100%; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.finup-analysis-data :is(th, td) { padding: .75rem .5rem; border-bottom: 1px solid #465149; text-align: right; font-weight: 400; }
+.finup-analysis-data th:first-child { text-align: left; }
+.finup-analysis-data thead th { color: #edf6f0; font-weight: 500; }
+.finup-analysis-comparison-list, .finup-analysis-ranking, .finup-analysis-payment-bars { display: grid; gap: 1.25rem; max-height: 26rem; overflow-y: auto; padding: 0 .375rem 0 0; scrollbar-width: thin; scrollbar-color: #657f6e transparent; list-style: none; }
+.finup-analysis-row-label { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .625rem; color: #eef4f0; font-size: .875rem; overflow-wrap: anywhere; }
+.finup-analysis-row-label small { align-self: center; border: 1px solid #4d5f53; border-radius: .25rem; padding: .1rem .375rem; color: #b1c4b8; font-size: .625rem; }
+.finup-analysis-paired-bar { display: flex; align-items: center; gap: .75rem; margin-top: .5rem; font-size: .75rem; font-variant-numeric: tabular-nums; }
+.finup-analysis-paired-bar > span:last-child { min-width: 6.5rem; text-align: right; white-space: nowrap; }
+.finup-analysis-track { flex: 1; height: .5rem; overflow: hidden; border-radius: .2rem; background: #35423a; }
+.finup-analysis-bar { display: block; height: 100%; border-radius: .2rem; background: var(--finup-chart-income); }
+.finup-analysis-bar--expense { background: var(--finup-chart-expense); }
+.finup-analysis-bar--credit { background: var(--finup-chart-income); }
+.finup-analysis-chart-note { margin-top: 1.25rem; color: #aab9af; font-size: .6875rem; line-height: 1.6; }
+.finup-analysis-list-count { margin-bottom: 1rem; color: #aab9af; font-size: .6875rem; line-height: 1.6; }
+.finup-analysis-scroll-hint { display: none; margin-top: .5rem; color: #aab9af; font-size: .6875rem; }
+.finup-analysis-ranking-heading { display: flex; align-items: baseline; gap: .625rem; margin-bottom: .75rem; }
+.finup-analysis-rank { color: #91a499; font-size: .6875rem; }
+.finup-analysis-ranking-heading > div { flex: 1; min-width: 0; }
+.finup-analysis-ranking-heading a { display: block; color: #eaf2ed; font-size: .8125rem; overflow-wrap: anywhere; }
+.finup-analysis-ranking-heading a:hover { color: #a7edbf; text-decoration: underline; }
+.finup-analysis-ranking-heading small { display: block; margin-top: .25rem; color: #aab9af; font-size: .6875rem; }
+.finup-analysis-ranking-heading strong { flex-shrink: 0; color: #f87171; font-size: .8125rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.finup-analysis-payment-chart figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; margin-bottom: 1.25rem; color: #b8c5bd; font-size: .6875rem; }
+.finup-analysis-payment-row-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .375rem 1rem; margin-bottom: .625rem; }
+.finup-analysis-payment-label { color: #eef4f0; font-size: .8125rem; }
+.finup-analysis-payment-amount { color: #eef4f0; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.finup-analysis-payment-percentage { display: inline-block; min-width: 3.5rem; margin-left: .5rem; color: #aab9af; font-size: .6875rem; text-align: right; }
+.finup-analysis-payment-track { height: .625rem; overflow: hidden; border-radius: .2rem; background: #35423a; }
+.finup-analysis-payment-bar { height: 100%; border-radius: .2rem; background: var(--finup-chart-expense); }
+.finup-analysis-payment-row--credit .finup-analysis-payment-bar { background: var(--finup-chart-income); }
+.finup-analysis-payment-row--credit .finup-analysis-payment-percentage { color: #a7edbf; }
+.finup-analysis-payment-note { margin-top: 1.25rem; color: #aab9af; font-size: .6875rem; line-height: 1.6; }
+.finup-analysis-empty, .finup-analysis-payment-empty { display: grid; align-content: center; justify-items: center; gap: .75rem; min-height: 15rem; padding: 1.5rem 1rem; text-align: center; }
+.finup-analysis-empty svg, .finup-analysis-payment-empty svg { width: 3rem; height: 3rem; color: #93e2ad; }
+.finup-analysis-empty p, .finup-analysis-payment-empty h3 { color: #edf4ef; font-size: .9375rem; font-weight: 500; }
+.finup-analysis-empty span, .finup-analysis-payment-empty p { max-width: 20rem; color: #aab9af; font-size: .8125rem; line-height: 1.6; }
+.finup-analysis-errors { margin-top: 1.25rem; padding: 1rem; border: 1px solid #bc7777; border-radius: .5rem; color: #ffcdcd; font-size: .875rem; }
+.finup-analysis-errors ul { margin-top: .5rem; padding-left: 1.25rem; list-style: disc; }
+
+@media (min-width: 640px) {
+    .finup-analysis-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .finup-analysis-totals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+    .finup-analysis-scroll-hint { display: block; }
+}
+@media (min-width: 1100px) {
+    .finup-analysis-filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .finup-analysis-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

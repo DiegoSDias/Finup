@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -47,19 +47,58 @@ class User extends Authenticatable
         ];
     }
 
-    public function expenses(): HasMany {
+    public function expenses(): HasMany
+    {
         return $this->hasMany(Expense::class);
     }
 
-    public function groups(): HasMany {
+    public function groups(): HasMany
+    {
         return $this->hasMany(Group::class);
     }
 
-    public function categories(): HasMany {
+    public function categories(): HasMany
+    {
         return $this->hasMany(Category::class);
     }
 
-    public function balances(): HasMany {
+    public function balances(): HasMany
+    {
         return $this->hasMany(MonthlyBalance::class);
+    }
+
+    public function pluggyItems(): HasMany
+    {
+        return $this->hasMany(PluggyItem::class);
+    }
+
+    public function pluggyAccounts(): HasMany
+    {
+        return $this->hasMany(PluggyAccount::class);
+    }
+
+    public function pluggyTransactions(): HasMany
+    {
+        return $this->hasMany(PluggyTransaction::class);
+    }
+
+    public function pluggyTransactionRules(): HasMany
+    {
+        return $this->hasMany(PluggyTransactionRule::class);
+    }
+
+    public function manualBanks(): HasMany
+    {
+        return $this->hasMany(ManualBank::class);
+    }
+
+    public function recurringExpenses(): HasMany
+    {
+        return $this->hasMany(RecurringExpense::class);
+    }
+
+    public function accountsPayable(): HasMany
+    {
+        return $this->hasMany(AccountPayable::class);
     }
 }
