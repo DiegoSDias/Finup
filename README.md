@@ -16,6 +16,69 @@ O worker usa tempo limite padrão de 240 segundos, alinhado aos jobs da Pluggy. 
 
 Para interromper os serviços, use `docker compose down`. Para remover também os dados locais do banco, use `docker compose down --volumes`.
 
+## Deploy na Vercel
+
+O deploy usa o [Container Runtime](https://vercel.com/docs/functions/runtimes/container) da Vercel, atualmente em beta. O arquivo `Dockerfile.vercel` tem prioridade sobre a detecção do Vite e monta uma imagem com PHP 8.3, FrankenPHP e os assets compilados. O Dockerfile e o Compose usados no desenvolvimento continuam independentes.
+
+Os arquivos de deploy têm estas responsabilidades:
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `Dockerfile.vercel` | Instalar as dependências de produção, compilar o frontend e montar a imagem da aplicação. |
+| `docker/vercel/Caddyfile` | Servir a pasta `public` por HTTP na porta informada em `PORT`, com padrão 80. A Vercel fornece o HTTPS público. |
+| `docker/vercel/entrypoint.sh` | Preparar os diretórios temporários usados pelo Laravel e iniciar o comando da imagem. |
+| `vercel.json` | Manter um worker da fila como Vercel Daemon, usando a mesma imagem e um comando diferente. |
+
+### Banco e variáveis de ambiente
+
+É necessário um **MySQL externo e persistente**, acessível pela Vercel. O serviço `db` do Compose e o endereço `localhost` não ficam disponíveis no deploy. Sessões, cache e fila também usam esse banco. Configure TLS conforme as instruções do provedor; se ele exigir um certificado CA, `MYSQL_ATTR_SSL_CA` deve apontar para o arquivo disponibilizado no contêiner.
+
+Em **Environment Variables**, cadastre os valores reais para **Production**:
+
+```env
+APP_NAME=Finup
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://seu-projeto.vercel.app
+APP_KEY=base64:SUBSTITUA_PELA_CHAVE_DA_APLICACAO
+
+DB_CONNECTION=mysql
+DB_HOST=host-do-mysql
+DB_PORT=3306
+DB_DATABASE=finup
+DB_USERNAME=usuario-do-mysql
+DB_PASSWORD=senha-do-mysql
+
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+DB_QUEUE_RETRY_AFTER=300
+LOG_CHANNEL=stderr
+
+PLUGGY_CLIENT_ID=seu-client-id
+PLUGGY_CLIENT_SECRET=seu-client-secret
+PLUGGY_BASE_URL=https://api.pluggy.ai
+PLUGGY_WEBHOOK_SECRET=seu-segredo-longo
+PLUGGY_WEBHOOK_URL=https://seu-projeto.vercel.app/webhooks/pluggy?token=seu-segredo-longo
+```
+
+Use a mesma `APP_KEY` em todos os deploys desse ambiente. Se for uma instalação nova, gere a chave uma única vez com `php artisan key:generate --show` e salve o resultado no painel. Deixe `SESSION_DOMAIN` sem configuração para o cookie usar o domínio acessado. As variáveis `VITE_*` são públicas no frontend e não devem conter credenciais.
+
+### Preparar o banco e publicar
+
+1. Construa a imagem: `docker build --file Dockerfile.vercel --tag finup-vercel .`.
+2. Para aplicar as migrations, coloque as variáveis reais em um arquivo local `.env.production` (ignorado pelo Git) e execute `docker run --rm --env-file .env.production finup-vercel php artisan migrate --force`. Faça isso como uma etapa controlada antes de liberar tráfego. As migrations não são executadas automaticamente a cada inicialização.
+3. Envie os arquivos para a branch do GitHub que será usada no deploy.
+4. Importe o repositório na Vercel com **Root Directory** `./` e **Application Preset** **Container**. Remova eventuais comandos personalizados de Build, Install e Output Directory do Vite; a imagem faz essas etapas.
+5. Cadastre as variáveis de ambiente, publique e confira `/up`, o login e os logs do worker em **Daemons**. Se a Vercel atribuir uma URL diferente, atualize `APP_URL` e `PLUGGY_WEBHOOK_URL` e faça um novo deploy.
+
+O daemon `queue` possui uma instância com 1 GiB de memória em `iad1`. Ajuste a região em `vercel.json` e a região da função no painel para ficarem próximas ao banco contratado. O tempo de encerramento de 300 segundos permite concluir os jobs que têm limite de 240 segundos. A configuração segue a [referência dos Daemons](https://vercel.com/docs/daemons/config-reference).
+
+Daemons estão em beta e executam apenas em **Production**. Para Preview, use um banco e credenciais separados; jobs enfileirados nesse banco precisarão de um worker próprio. O worker de produção permanece ativo e seu consumo deve ser acompanhado no painel.
+
+A imagem grava views e caches temporários em `/tmp` e envia logs para `stderr`. Esses arquivos não são persistentes. Uploads que precisem sobreviver a um novo contêiner devem usar armazenamento externo. O Laravel confia nos cabeçalhos do proxy apenas quando `DEPLOY_TARGET=vercel`, definido pela imagem de deploy.
+
 ## O que a integração faz
 
 - Abre o Pluggy Connect sem expor `PLUGGY_CLIENT_SECRET` ao navegador.
